@@ -1,6 +1,6 @@
 /*
 (KREDIT JANGAN DIHAPUS!!!)
-EDUFRAME WEB APP
+EDU-FRAME WEB APP
 VERSION : 1.0
 DEV BY : GARIN NUGROHO
 */
@@ -9,7 +9,7 @@ require("dotenv").config();
 const mysql = require("mysql2/promise");
 
 const databaseConfig = {
-  host: process.env.HOST,
+  host: process.env.DB_HOST,
   user: process.env.DB_USER,
   database: process.env.DB_NAME,
   password: process.env.DB_PASS,

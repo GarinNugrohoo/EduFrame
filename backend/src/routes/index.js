@@ -7,9 +7,9 @@ DEV BY : GARIN NUGROHO
 
 const router = require("express").Router();
 const users = require("./users");
-const apikey = require("./apikey");
+const materi = require("./materi");
 
-router.use("/api/", users);
-router.use("/api/", apikey);
+router.use("/api", users);
+router.use("/api/v1", materi);
 
 module.exports = router;

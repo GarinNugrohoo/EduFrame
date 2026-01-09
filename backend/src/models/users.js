@@ -6,8 +6,6 @@ class User {
   static async register(userData) {
     try {
       const { username, email, password } = userData;
-
-      // Pengecekan Username
       const [dataUsername] = await db.query(
         "SELECT id FROM users WHERE username = ? LIMIT 1",
         [username]
@@ -21,7 +19,6 @@ class User {
         };
       }
 
-      // Pengecekan Email
       const [dataEmail] = await db.query(
         "SELECT id FROM users WHERE email = ? LIMIT 1",
         [email]
@@ -35,7 +32,6 @@ class User {
         };
       }
 
-      // Insert ke database
       const passwordHash = await bcrypt.hash(password, 10);
       const sql = `INSERT INTO users (username, email, password) 
                         VALUES (?, ?, ?)`;

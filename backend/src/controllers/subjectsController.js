@@ -59,6 +59,42 @@ class materi {
       });
     }
   }
+
+  static async deleteById(req, res) {
+    try {
+      const { id } = req.params;
+      const data = await materiModels.deleteById(id);
+
+      if (data.message === "Data tidak ditemukan") {
+        return res.status(404).json(data);
+      } else if (data.message === "Berhasil menghapus data") {
+        return res.status(200).json(data);
+      }
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Internal Server Error",
+        server_message: error.message,
+      });
+    }
+  }
+
+  static async deleteAll(req, res) {
+    try {
+      const data = await materiModels.deleteAll();
+      if (data.message === "Data tidak ditemukan") {
+        return res.status(400).json(data);
+      } else if (data.message === "Berhasil menghapus data") {
+        return res.status(400).json(data);
+      }
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Internal Server Error",
+        server_message: error.message,
+      });
+    }
+  }
 }
 
 module.exports = materi;

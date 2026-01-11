@@ -75,7 +75,46 @@ class materiModels {
     }
   }
 
-  static async delete() {}
+  static async deleteAll() {
+    try {
+      const sql = "DELETE FROM subjects";
+      const data = await db.execute(sql);
+
+      if (data.length === 0) {
+        return {
+          success: false,
+          message: "Data tidak ditemukan",
+        };
+      } else if (data.length > 0) {
+        return {
+          success: true,
+          message: "Berhasil menghapus data",
+        };
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async deleteById(id) {
+    try {
+      const sql = "DELETE FROM subjects WHERE id = ?";
+      const data = await db.execute(sql, [id]);
+      if (data.length === 0) {
+        return {
+          success: false,
+          message: "Data tidak ditemukan",
+        };
+      } else if (data.length > 0) {
+        return {
+          success: false,
+          message: "Berhasil menghapus data",
+        };
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = materiModels;

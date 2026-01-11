@@ -1,7 +1,6 @@
 const User = require("../models/users");
 
 class userController {
-  // Untuk mengambil semua data user
   async getAll(req, res) {
     try {
       const data = await User.getAll();
@@ -20,7 +19,6 @@ class userController {
     }
   }
 
-  // Untuk mengambil data user menggunakan id
   async getById(req, res) {
     try {
       const { id } = req.params;
@@ -40,7 +38,6 @@ class userController {
     }
   }
 
-  // Untuk login user
   async login(req, res) {
     try {
       const { email, password } = req.body;
@@ -63,7 +60,6 @@ class userController {
     }
   }
 
-  // Untuk register user
   async register(req, res) {
     try {
       const { username, email, password } = req.body;

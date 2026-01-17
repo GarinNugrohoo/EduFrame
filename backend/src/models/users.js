@@ -52,7 +52,7 @@ class User {
   static async login(userData) {
     try {
       const { email, password } = userData;
-      const sql = `SELECT id, username, email, password FROM users 
+      const sql = `SELECT id, username, email, password, created_at FROM users 
                         WHERE email = ?`;
       const [data] = await db.query(sql, [email]);
 
@@ -69,6 +69,7 @@ class User {
         return {
           success: true,
           message: "Akun berhasil login",
+          data: result,
         };
       } else {
         return {

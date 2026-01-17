@@ -69,7 +69,13 @@ class userController {
         password: password,
       });
 
-      return res.status(200).json(data);
+      if (data.message === "Email sudah terdaftar") {
+        return res.status(500).json(data);
+      } else if (data.message === "Username sudah terdaftar") {
+        return res.status(500).json(data);
+      } else {
+        return res.status(200).json(data);
+      }
     } catch (error) {
       return res.status(500).json({
         success: false,

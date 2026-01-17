@@ -8,6 +8,7 @@ import {
   BriefcaseIcon,
   LightBulbIcon,
 } from "../icons/IkonWrapper";
+import logo from "../../assets/EduFrame.png";
 import FloatingElements from "./FloatingElements";
 
 const WelcomeScreen = ({ onLogin, onRegister }) => {
@@ -54,9 +55,12 @@ const WelcomeScreen = ({ onLogin, onRegister }) => {
           {/* Left Column - Hero Content */}
           <div className="lg:w-1/2 text-center lg:text-left">
             {/* Logo/Icon */}
-            <div className="mb-6 md:mb-8">
-              <div className="inline-flex items-center justify-center w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-red-600 to-rose-700 rounded-2xl md:rounded-3xl shadow-lg">
-                <GraduationIcon className="w-10 h-10 md:w-12 md:h-12 text-white" />
+            <div className="mb-6 md:mb-8 md:mt-5 mt-15">
+              <div className="inline-flex items-center justify-center w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-red-100 to-rose-200 rounded-2xl md:rounded-3xl shadow-lg">
+                <img
+                  src={logo}
+                  className="w-10 h-10 md:w-12 md:h-12 text-white"
+                ></img>
               </div>
             </div>
 

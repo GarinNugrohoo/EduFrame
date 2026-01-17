@@ -1,13 +1,5 @@
 import PropTypes from "prop-types";
-import {
-  UserIcon,
-  EnvelopeIcon,
-  LockIcon,
-  EyeIcon,
-  EyeSlashIcon,
-  CalendarIcon,
-  CheckIcon,
-} from "../icons/IkonWrapper";
+import { CheckIcon } from "../icons/IkonWrapper";
 
 export const ProfileSection = ({
   field,

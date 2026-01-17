@@ -1,4 +1,5 @@
 import { ArrowLeftIcon, CheckIcon, GraduationIcon } from "../icons/IkonWrapper";
+import logo from "../../assets/EduFrame.png";
 
 const TermsConditions = ({ onBack }) => {
   return (
@@ -15,8 +16,8 @@ const TermsConditions = ({ onBack }) => {
           </button>
 
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-red-600 to-rose-700 rounded-xl flex items-center justify-center">
-              <GraduationIcon className="w-6 h-6 md:w-7 md:h-7 text-white" />
+            <div className="w-10 h-10 md:w-12 md:h-12  flex items-center justify-center">
+              <img src={logo} alt="" />
             </div>
             <span className="text-xl md:text-2xl font-bold text-gray-900">
               EduFrame

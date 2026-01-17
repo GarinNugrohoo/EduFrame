@@ -1,14 +1,19 @@
 import { Link, useLocation } from "react-router-dom";
-import { HomeIcon, GameIcon, UserIcon, MenuIcon } from "../icons/IkonWrapper";
+import {
+  HomeIcon,
+  GameIcon,
+  UserIcon,
+  HistoryIcon,
+} from "../icons/IkonWrapper";
 
 function BottomNavigation() {
   const location = useLocation();
 
   const navItems = [
-    { path: "/", label: "Beranda", icon: HomeIcon },
+    { path: "/home", label: "Beranda", icon: HomeIcon },
     { path: "/quiz", label: "Quiz", icon: GameIcon },
+    { path: "/history", label: "History", icon: HistoryIcon },
     { path: "/profile", label: "Profile", icon: UserIcon },
-    { path: "/settings", label: "Settings", icon: MenuIcon },
   ];
 
   return (

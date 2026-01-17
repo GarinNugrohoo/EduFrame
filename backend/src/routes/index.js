@@ -9,8 +9,14 @@ const router = require("express").Router();
 const users = require("./users");
 const materi = require("./materi");
 const admins = require("./admins");
+const corsOptions = {
+  origin: "http://192.168.1.9:5173",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "apikey"],
+};
 
-router.use(cors());
+router.use(cors(corsOptions));
 router.use("/api/users", users);
 router.use("/api/materi", materi);
 router.use("/api/admins", admins);

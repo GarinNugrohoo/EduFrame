@@ -37,7 +37,21 @@ import {
   FaBriefcase,
   FaLightbulb,
   FaChartBar,
+  FaUserShield,
+  FaHistory,
+  FaCheckCircle,
+  FaClock,
+  FaExternalLinkAlt,
+  FaVideo,
+  FaXbox,
+  FaFileAlt,
+  FaPlayCircle,
+  FaTrophy,
+  FaChevronCircleDown,
+  FaChevronCircleUp,
 } from "react-icons/fa";
+
+import { FaXmark } from "react-icons/fa6";
 
 // Icon Wrappers untuk aplikasi edukasi
 export const GameIcon = (props) => <FaGamepad {...props} />;
@@ -78,6 +92,18 @@ export const BookOpenIcon = (props) => <FaBookOpen {...props} />;
 export const BriefcaseIcon = (props) => <FaBriefcase {...props} />;
 export const LightBulbIcon = (props) => <FaLightbulb {...props} />;
 export const ChartBarIcon = (props) => <FaChartBar {...props} />;
+export const ShieldCheckIcon = (props) => <FaUserShield {...props} />;
+export const HistoryIcon = (props) => <FaHistory {...props} />;
+export const CheckCircleIcon = (props) => <FaCheckCircle {...props} />;
+export const ClockIcon = (props) => <FaClock {...props} />;
+export const ExternalLinkIcon = (props) => <FaExternalLinkAlt {...props} />;
+export const VideoIcon = (props) => <FaVideo {...props} />;
+export const XIcon = (props) => <FaXmark {...props} />;
+export const FileTextIcon = (props) => <FaFileAlt {...props} />;
+export const PlayCircleIcon = (props) => <FaPlayCircle {...props} />;
+export const TrophyIcon = (props) => <FaTrophy {...props} />;
+export const ChevronDownIcon = (props) => <FaChevronCircleDown {...props} />;
+export const ChevronUpIcon = (props) => <FaChevronCircleUp {...props} />;
 
 // Optional: Export juga FaIcons langsung jika ada yang perlu akses langsung
 export {
@@ -118,6 +144,15 @@ export {
   FaBriefcase,
   FaLightbulb,
   FaChartBar,
+  FaUserShield,
+  FaHistory,
+  FaCheckCircle,
+  FaClock,
+  FaExternalLinkAlt,
+  FaFileAlt,
+  FaXmark,
+  FaVideo,
+  FaPlayCircle,
 };
 
 // Optional: Default export untuk kemudahan import
@@ -160,6 +195,15 @@ const IkonWrapper = {
   LightBulbIcon,
   BriefcaseIcon,
   ChartBarIcon,
+  ShieldCheckIcon,
+  HistoryIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  ExternalLinkIcon,
+  VideoIcon,
+  XIcon,
+  FileTextIcon,
+  PlayCircleIcon,
 };
 
 export default IkonWrapper;

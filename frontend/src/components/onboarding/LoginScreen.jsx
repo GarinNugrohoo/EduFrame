@@ -1,8 +1,8 @@
 // src/components/onboarding/LoginScreen.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import logo from "../../assets/EduFrame.png";
 import PropTypes from "prop-types";
 import {
-  GraduationIcon,
   ArrowLeftIcon,
   ArrowRightIcon,
   EnvelopeIcon,
@@ -10,42 +10,57 @@ import {
   EyeIcon,
   EyeSlashIcon,
   CheckIcon,
-  GoogleIcon,
-  FacebookIcon,
-  AppleIcon,
 } from "../icons/IkonWrapper";
 import FloatingElements from "./FloatingElements";
 
 const LoginScreen = ({
   formData,
   errors,
+  apiError,
   rememberMe,
+  isSubmitting,
   onBack,
   onSwitchToRegister,
   onFormChange,
   onRememberMeChange,
   onValidate,
   onSubmit,
+  loginSuccessMessage, // Tambah prop untuk success message
 }) => {
   const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [localSuccessMessage, setLocalSuccessMessage] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  // Handle success message dari parent atau state lokal
+  useEffect(() => {
+    if (loginSuccessMessage) {
+      setLocalSuccessMessage(loginSuccessMessage);
+      setShowSuccess(true);
+
+      // Auto hide success message setelah 3 detik
+      const timer = setTimeout(() => {
+        setShowSuccess(false);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [loginSuccessMessage]);
 
   const handleInputChange = (field, value) => {
     onFormChange({ ...formData, [field]: value });
+    // Clear success message saat user mulai mengetik
+    if (showSuccess) {
+      setShowSuccess(false);
+    }
   };
 
   const handleBlur = (field, value) => {
     onValidate(field, value);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    try {
-      await onSubmit(e);
-    } finally {
-      setIsSubmitting(false);
-    }
+    onSubmit(e);
   };
 
   return (
@@ -68,8 +83,8 @@ const LoginScreen = ({
         <div className="bg-white rounded-2xl md:rounded-3xl shadow-xl md:shadow-2xl border border-gray-200/50 p-6 md:p-8 lg:p-10">
           {/* Header */}
           <div className="text-center mb-8 md:mb-10">
-            <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-red-600 to-rose-700 rounded-2xl md:rounded-3xl shadow-md md:shadow-lg mb-4 md:mb-6">
-              <GraduationIcon className="w-8 h-8 md:w-10 md:h-10 text-white" />
+            <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-red-100 to-rose-200 rounded-2xl md:rounded-3xl shadow-md md:shadow-lg mb-4 md:mb-6">
+              <img src={logo} className="w-8 h-8 md:w-10 md:h-10 text-white" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 md:mb-3">
               Selamat Datang Kembali
@@ -78,6 +93,41 @@ const LoginScreen = ({
               Masuk untuk melanjutkan pembelajaran Anda
             </p>
           </div>
+
+          {/* Success Message */}
+          {showSuccess && localSuccessMessage && (
+            <div className="mb-6 animate-fade-in">
+              <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center animate-pulse">
+                    <CheckIcon className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-green-700 font-medium">
+                      {localSuccessMessage}
+                    </p>
+                    <div className="w-full h-1 mt-2 bg-green-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-green-500 animate-progress"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* API Error Message */}
+          {apiError && (
+            <div className="mb-6 animate-fade-in">
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                    <span className="text-red-600 font-bold">!</span>
+                  </div>
+                  <p className="text-red-700 font-medium">{apiError}</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6">
@@ -101,6 +151,7 @@ const LoginScreen = ({
                       : "border-gray-300 focus:border-red-500 focus:ring-red-500"
                   } rounded-xl focus:ring-2 focus:ring-opacity-20 focus:outline-none transition-all duration-200 text-base`}
                   placeholder="nama@email.com"
+                  disabled={isSubmitting}
                 />
                 {errors.email && (
                   <p className="mt-1.5 text-sm text-red-600">{errors.email}</p>
@@ -130,11 +181,13 @@ const LoginScreen = ({
                       : "border-gray-300 focus:border-red-500 focus:ring-red-500"
                   } rounded-xl focus:ring-2 focus:ring-opacity-20 focus:outline-none transition-all duration-200 text-base`}
                   placeholder="Masukkan password"
+                  disabled={isSubmitting}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  disabled={isSubmitting}
                 >
                   {showPassword ? (
                     <EyeSlashIcon className="h-5 w-5" />
@@ -159,13 +212,14 @@ const LoginScreen = ({
                     checked={rememberMe}
                     onChange={(e) => onRememberMeChange(e.target.checked)}
                     className="sr-only"
+                    disabled={isSubmitting}
                   />
                   <div
                     className={`w-5 h-5 md:w-6 md:h-6 border-2 rounded-lg flex items-center justify-center transition-all ${
                       rememberMe
                         ? "bg-red-600 border-red-600"
                         : "border-gray-300 hover:border-gray-400"
-                    }`}
+                    } ${isSubmitting ? "opacity-50" : ""}`}
                   >
                     {rememberMe && (
                       <CheckIcon className="w-3 h-3 md:w-4 md:h-4 text-white" />
@@ -178,7 +232,8 @@ const LoginScreen = ({
               </label>
               <button
                 type="button"
-                className="text-sm md:text-base text-red-600 hover:text-red-700 font-medium transition-colors text-left sm:text-right"
+                className="text-sm md:text-base text-red-600 hover:text-red-700 font-medium transition-colors text-left sm:text-right disabled:opacity-50"
+                disabled={isSubmitting}
               >
                 Lupa password?
               </button>
@@ -208,47 +263,14 @@ const LoginScreen = ({
             </button>
           </form>
 
-          {/* Divider */}
-          {/* <div className="relative my-6 md:my-8">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
-            </div>
-            <div className="relative flex justify-center">
-              <span className="px-3 md:px-4 bg-white text-gray-500 text-xs md:text-sm">
-                atau masuk dengan
-              </span>
-            </div>
-          </div> */}
-
-          {/* Social Login */}
-          {/* <div className="grid grid-cols-3 gap-3 md:gap-4">
-            <button className="flex items-center justify-center gap-2 py-3 md:py-3.5 border border-gray-300 hover:border-gray-400 rounded-xl hover:bg-gray-50 transition-all duration-200 group">
-              <GoogleIcon className="w-5 h-5 text-gray-600 group-hover:scale-110 transition-transform" />
-              <span className="text-sm font-medium hidden md:inline">
-                Google
-              </span>
-            </button>
-            <button className="flex items-center justify-center gap-2 py-3 md:py-3.5 border border-gray-300 hover:border-gray-400 rounded-xl hover:bg-gray-50 transition-all duration-200 group">
-              <FacebookIcon className="w-5 h-5 text-blue-600 group-hover:scale-110 transition-transform" />
-              <span className="text-sm font-medium hidden md:inline">
-                Facebook
-              </span>
-            </button>
-            <button className="flex items-center justify-center gap-2 py-3 md:py-3.5 border border-gray-300 hover:border-gray-400 rounded-xl hover:bg-gray-50 transition-all duration-200 group">
-              <AppleIcon className="w-5 h-5 text-gray-800 group-hover:scale-110 transition-transform" />
-              <span className="text-sm font-medium hidden md:inline">
-                Apple
-              </span>
-            </button>
-          </div> */}
-
           {/* Sign Up Link */}
           <div className="mt-6 md:mt-8 pt-6 border-t border-gray-200">
             <p className="text-center text-gray-600 text-sm md:text-base">
               Belum punya akun?{" "}
               <button
                 onClick={onSwitchToRegister}
-                className="text-red-600 hover:text-red-700 font-semibold transition-colors"
+                className="text-red-600 hover:text-red-700 font-semibold transition-colors disabled:opacity-50"
+                disabled={isSubmitting}
               >
                 Daftar sekarang
               </button>
@@ -273,13 +295,22 @@ LoginScreen.propTypes = {
     password: PropTypes.string,
   }).isRequired,
   errors: PropTypes.object,
+  apiError: PropTypes.string,
+  loginSuccessMessage: PropTypes.string, // Tambah propTypes
   rememberMe: PropTypes.bool,
+  isSubmitting: PropTypes.bool,
   onBack: PropTypes.func.isRequired,
   onSwitchToRegister: PropTypes.func.isRequired,
   onFormChange: PropTypes.func.isRequired,
   onRememberMeChange: PropTypes.func.isRequired,
   onValidate: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+};
+
+LoginScreen.defaultProps = {
+  apiError: "",
+  loginSuccessMessage: "",
+  isSubmitting: false,
 };
 
 export default LoginScreen;

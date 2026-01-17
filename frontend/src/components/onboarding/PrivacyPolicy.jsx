@@ -1,8 +1,5 @@
-import {
-  ArrowLeftIcon,
-  ShieldCheckIcon,
-  GraduationIcon,
-} from "../icons/IkonWrapper";
+import { ArrowLeftIcon } from "../icons/IkonWrapper";
+import logo from "../../assets/EduFrame.png";
 
 const PrivacyPolicy = ({ onBack }) => {
   return (
@@ -19,8 +16,8 @@ const PrivacyPolicy = ({ onBack }) => {
           </button>
 
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-600 to-cyan-700 rounded-xl flex items-center justify-center">
-              <ShieldCheckIcon className="w-6 h-6 md:w-7 md:h-7 text-white" />
+            <div className="w-8 h-8 md:w-12 md:h-12  flex items-center justify-center">
+              <img src={logo} alt="" />
             </div>
             <span className="text-xl md:text-2xl font-bold text-gray-900">
               EduFrame
@@ -70,13 +67,12 @@ const PrivacyPolicy = ({ onBack }) => {
                   </h3>
                   <ul className="space-y-1 list-disc pl-5">
                     <li>Informasi pendaftaran (nama, email, password)</li>
-                    <li>Data profil (foto, bio, preferensi belajar)</li>
                     <li>Riwayat pembelajaran dan progress</li>
-                    <li>Konten yang Anda unggah atau buat</li>
+                    {/* <li>Konten yang Anda unggah atau buat</li> */}
                   </ul>
                 </div>
 
-                <div className="bg-green-50 rounded-xl p-4">
+                {/* <div className="bg-green-50 rounded-xl p-4">
                   <h3 className="font-semibold text-gray-900 mb-2">
                     Data Otomatis:
                   </h3>
@@ -88,7 +84,7 @@ const PrivacyPolicy = ({ onBack }) => {
                     </li>
                     <li>Data kinerja platform</li>
                   </ul>
-                </div>
+                </div> */}
               </div>
             </section>
 
@@ -111,10 +107,10 @@ const PrivacyPolicy = ({ onBack }) => {
                   <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
                   <span>Memperbaiki dan meningkatkan pengalaman belajar</span>
                 </li>
-                <li className="flex items-start gap-3">
+                {/* <li className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
                   <span>Mengirim notifikasi dan pembaruan penting</span>
-                </li>
+                </li> */}
                 <li className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
                   <span>
@@ -157,11 +153,11 @@ const PrivacyPolicy = ({ onBack }) => {
               </p>
               <ul className="space-y-2 list-disc pl-5">
                 <li>Penyedia layanan yang membantu operasional platform</li>
-                <li>Pihak berwenang jika diwajibkan oleh hukum</li>
+                {/* <li>Pihak berwenang jika diwajibkan oleh hukum</li>
                 <li>
                   Mitra yang menyediakan layanan tambahan (dengan persetujuan
                   Anda)
-                </li>
+                </li> */}
               </ul>
             </section>
 
@@ -196,14 +192,14 @@ const PrivacyPolicy = ({ onBack }) => {
                     Anda dapat meminta penghapusan data pribadi
                   </p>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-4">
+                {/* <div className="bg-gray-50 rounded-xl p-4">
                   <h3 className="font-semibold text-gray-900 mb-2">
                     Hak Pembatasan
                   </h3>
                   <p className="text-sm">
                     Anda dapat membatasi pemrosesan data Anda
                   </p>
-                </div>
+                </div> */}
               </div>
             </section>
 

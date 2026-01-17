@@ -1,26 +1,55 @@
-import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import logo from "../../assets/EduFrame.png";
 import { UserIcon } from "../icons/IkonWrapper";
 
-const Navbar = ({ userName = "Garin Nugroho" }) => {
+const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const [userName, setUserName] = useState("");
 
   const isActive = (path) => {
     return location.pathname === path;
   };
 
+  useEffect(() => {
+    const loadUserData = () => {
+      try {
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          const user = JSON.parse(userStr);
+
+          if (user.username) {
+            setUserName(user.username);
+          } else if (user.email) {
+            const nameFromEmail = user.email.split("@")[0];
+            setUserName(nameFromEmail);
+          }
+        } else {
+          setTimeout(() => {
+            navigate("/onboarding/login");
+          }, 1000);
+        }
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+      }
+    };
+
+    loadUserData();
+  }, [navigate]);
+
   const navItems = [
-    { path: "/", label: "Beranda" },
+    { path: "/home", label: "Beranda" },
     { path: "/quiz", label: "Quiz" },
+    { path: "/history", label: "History" },
     { path: "/profile", label: "Profile" },
-    { path: "/Settings", label: "Settings" },
   ];
 
   return (
     <header className="bg-white shadow-md border-b border-gray-100 px-4 py-3 sticky top-0 z-50 transition-all duration-300">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        {/* Logo Section */}
         <div className="flex items-center space-x-3 group">
           <Link to="/" className="flex items-center space-x-3 no-underline">
             <div className="relative">
@@ -47,7 +76,6 @@ const Navbar = ({ userName = "Garin Nugroho" }) => {
           </Link>
         </div>
 
-        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1">
           {navItems.map((item) => (
             <Link
@@ -65,17 +93,14 @@ const Navbar = ({ userName = "Garin Nugroho" }) => {
           ))}
         </nav>
 
-        {/* User Section */}
         <div className="flex items-center space-x-4">
-          {/* User Greeting (Desktop only) */}
           <div className="hidden md:block text-right">
             <p className="text-sm font-medium text-gray-900 truncate max-w-37.5">
-              {userName.split(" ")[0]}
+              {userName}
             </p>
             <p className="text-xs text-gray-500">User</p>
           </div>
 
-          {/* User Avatar */}
           <Link
             to="/profile"
             className={`relative group/avatar flex items-center justify-center transition-all duration-200 ${
@@ -93,7 +118,6 @@ const Navbar = ({ userName = "Garin Nugroho" }) => {
               <UserIcon className="text-white w-5 h-5" aria-hidden="true" />
             </div>
 
-            {/* Tooltip */}
             <div className="absolute top-full right-0 mt-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover/avatar:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
               Lihat Profil
             </div>
@@ -104,12 +128,6 @@ const Navbar = ({ userName = "Garin Nugroho" }) => {
   );
 };
 
-Navbar.propTypes = {
-  userName: PropTypes.string,
-};
-
-Navbar.defaultProps = {
-  userName: "Garin Nugroho",
-};
+Navbar.propTypes = {};
 
 export default Navbar;

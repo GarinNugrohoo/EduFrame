@@ -1,10 +1,40 @@
+// src/App.js
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import OnboardingAuth from "./pages/OnboardingAuth";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
+import Navbar from "./components/navigations/Navbar";
+import BottomNavigation from "./components/navigations/BottomNavigation";
+import RoadMap from "./pages/RoadMap";
 
 function App() {
-  const isAuthenticated = false; // Ganti dengan logika auth sesungguhnya
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const user = localStorage.getItem("user");
+      setIsAuthenticated(!!user);
+    };
+
+    checkAuth();
+
+    const handleStorageChange = (e) => {
+      if (e.key === "user") {
+        checkAuth();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    const handleAuthChange = () => checkAuth();
+    window.addEventListener("authChange", handleAuthChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("authChange", handleAuthChange);
+    };
+  }, []);
 
   return (
     <BrowserRouter>
@@ -20,10 +50,83 @@ function App() {
               )
             }
           />
-          <Route path="/onboarding" element={<OnboardingAuth />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/profile" element={<Profile />} />
-          {/* Tambahkan route lainnya */}
+
+          {/* Onboarding routes */}
+          <Route
+            path="/onboarding/*"
+            element={
+              isAuthenticated ? (
+                <Navigate to="/home" replace />
+              ) : (
+                <OnboardingAuth />
+              )
+            }
+          />
+
+          {/* Main app routes */}
+          <Route
+            path="/home"
+            element={
+              isAuthenticated ? (
+                <>
+                  <Navbar />
+                  <Home />
+                  <BottomNavigation />
+                </>
+              ) : (
+                <Navigate to="/onboarding" replace />
+              )
+            }
+          />
+
+          <Route
+            path="/profile"
+            element={
+              isAuthenticated ? (
+                <>
+                  <Navbar />
+                  <Profile />
+                  <BottomNavigation />
+                </>
+              ) : (
+                <Navigate to="/onboarding" replace />
+              )
+            }
+          />
+
+          <Route
+            path="/history"
+            element={
+              isAuthenticated ? (
+                <>
+                  <Navbar />
+
+                  <BottomNavigation />
+                </>
+              ) : (
+                <Navigate to="/onboarding" replace />
+              )
+            }
+          />
+
+          <Route
+            path="/quiz"
+            element={
+              isAuthenticated ? (
+                <>
+                  <Navbar />
+
+                  <BottomNavigation />
+                </>
+              ) : (
+                <Navigate to="/onboarding" replace />
+              )
+            }
+          />
+
+          <Route path="/roadmap/:subjectId" element={<RoadMap />} />
+
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
     </BrowserRouter>

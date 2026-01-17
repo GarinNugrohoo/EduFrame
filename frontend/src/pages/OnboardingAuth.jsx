@@ -1,27 +1,47 @@
+// src/pages/OnboardingAuth.jsx
 import React, { useState } from "react";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import WelcomeScreen from "../components/onboarding/WelcomeScreen";
 import LoginScreen from "../components/onboarding/LoginScreen";
 import RegisterScreen from "../components/onboarding/RegisterScreen";
 import OnboardingSlides from "../components/onboarding/OnboardingSlides";
+import TermsConditions from "../components/onboarding/TermsConditions";
+import PrivacyPolicy from "../components/onboarding/PrivacyPolicy";
+import auth from "../api/auth";
 
 const OnboardingAuth = () => {
-  const [mode, setMode] = useState("slides"); // slides, welcome, login, register
+  const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [formData, setFormData] = useState({
-    name: "",
+  const [loginSuccessMessage, setLoginSuccessMessage] = useState("");
+
+  // Login state
+  const [loginFormData, setLoginFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [loginErrors, setLoginErrors] = useState({});
+  const [loginApiError, setLoginApiError] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+
+  // Register state
+  const [registerFormData, setRegisterFormData] = useState({
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
-  const [errors, setErrors] = useState({});
-  const [rememberMe, setRememberMe] = useState(false);
+  const [registerErrors, setRegisterErrors] = useState({});
+  const [registerApiError, setRegisterApiError] = useState("");
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
 
-  // Navigate to different modes
+  // Navigate functions
   const handleNextSlide = () => {
     if (currentSlide < 2) {
       setCurrentSlide(currentSlide + 1);
     } else {
-      setMode("welcome");
+      navigate("/onboarding/welcome");
     }
   };
 
@@ -32,16 +52,55 @@ const OnboardingAuth = () => {
   };
 
   const handleSkipSlides = () => {
-    setMode("welcome");
+    navigate("/onboarding/welcome");
   };
 
-  // Form validation
-  const validate = (field, value) => {
+  const handleBackToWelcome = () => {
+    navigate("/onboarding/welcome");
+  };
+
+  const handleGoToLogin = () => {
+    navigate("/onboarding/login");
+    setLoginApiError("");
+  };
+
+  const handleGoToRegister = () => {
+    navigate("/onboarding/register");
+    setRegisterApiError("");
+  };
+
+  const handleGoToTerms = () => {
+    navigate("/onboarding/terms");
+  };
+
+  const handleGoToPrivacy = () => {
+    navigate("/onboarding/privacy");
+  };
+
+  // Form validation for login
+  const validateLogin = (field, value) => {
     let error = "";
     switch (field) {
-      case "name":
-        if (!value.trim()) error = "Nama tidak boleh kosong";
-        else if (value.length < 3) error = "Nama minimal 3 karakter";
+      case "email":
+        if (!value.trim()) error = "Email tidak boleh kosong";
+        else if (!/\S+@\S+\.\S+/.test(value))
+          error = "Format email tidak valid";
+        break;
+      case "password":
+        if (!value) error = "Password tidak boleh kosong";
+        break;
+    }
+    setLoginErrors((prev) => ({ ...prev, [field]: error }));
+    return error === "";
+  };
+
+  // Form validation for register
+  const validateRegister = (field, value) => {
+    let error = "";
+    switch (field) {
+      case "username":
+        if (!value.trim()) error = "Username tidak boleh kosong";
+        else if (value.length < 3) error = "Username minimal 3 karakter";
         break;
       case "email":
         if (!value.trim()) error = "Email tidak boleh kosong";
@@ -53,87 +112,215 @@ const OnboardingAuth = () => {
         else if (value.length < 8) error = "Password minimal 8 karakter";
         break;
       case "confirmPassword":
-        if (value !== formData.password) error = "Password tidak cocok";
+        if (value !== registerFormData.password) error = "Password tidak cocok";
         break;
     }
-    setErrors((prev) => ({ ...prev, [field]: error }));
+    setRegisterErrors((prev) => ({ ...prev, [field]: error }));
     return error === "";
   };
 
-  const handleSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    if (mode === "login") {
-      const emailValid = validate("email", formData.email);
-      const passwordValid = validate("password", formData.password);
-      if (emailValid && passwordValid) {
-        console.log("Login:", {
-          email: formData.email,
-          password: formData.password,
-        });
-        // Handle login logic
+    setLoginApiError("");
+    setLoginSuccessMessage("");
+    // Validasi form
+    const emailValid = validateLogin("email", loginFormData.email);
+    const passwordValid = validateLogin("password", loginFormData.password);
+
+    if (!emailValid || !passwordValid) {
+      return;
+    }
+
+    setIsLoggingIn(true);
+
+    try {
+      const result = await auth.login({
+        email: loginFormData.email,
+        password: loginFormData.password,
+      });
+
+      if (result.success) {
+        setLoginSuccessMessage(
+          "Login berhasil! Mengalihkan ke halaman utama..."
+        );
+
+        window.dispatchEvent(new Event("authChange"));
+        setTimeout(() => {
+          navigate("/home", { replace: true });
+        }, 3000);
+      } else {
+        setLoginApiError(result.message);
       }
-    } else if (mode === "register") {
-      const nameValid = validate("name", formData.name);
-      const emailValid = validate("email", formData.email);
-      const passwordValid = validate("password", formData.password);
-      const confirmValid = validate(
-        "confirmPassword",
-        formData.confirmPassword
-      );
-      if (nameValid && emailValid && passwordValid && confirmValid) {
-        console.log("Register:", formData);
-        // Handle register logic
-      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setLoginApiError("Terjadi kesalahan. Silakan coba lagi.");
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
-  // Render based on mode
-  switch (mode) {
-    case "slides":
-      return (
-        <OnboardingSlides
-          currentSlide={currentSlide}
-          onNext={handleNextSlide}
-          onPrevious={handlePreviousSlide}
-          onSkip={handleSkipSlides}
-        />
+  // Handle Register Submit dengan API
+  const handleRegisterSubmit = async (e) => {
+    e.preventDefault();
+    setRegisterApiError("");
+
+    const usernameValid = validateRegister(
+      "username",
+      registerFormData.username
+    );
+    const emailValid = validateRegister("email", registerFormData.email);
+    const passwordValid = validateRegister(
+      "password",
+      registerFormData.password
+    );
+    const confirmValid = validateRegister(
+      "confirmPassword",
+      registerFormData.confirmPassword
+    );
+
+    if (!usernameValid || !emailValid || !passwordValid || !confirmValid) {
+      return;
+    }
+
+    if (!agreeTerms) {
+      setRegisterApiError("Anda harus menyetujui Syarat & Ketentuan");
+      return;
+    }
+
+    setIsRegistering(true);
+
+    try {
+      const result = await auth.register({
+        username: registerFormData.username,
+        email: registerFormData.email,
+        password: registerFormData.password,
+      });
+
+      if (result.success) {
+        console.log("Registration successful:", result.data);
+
+        setRegisterFormData({
+          username: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
+        setRegisterErrors({});
+        setAgreeTerms(false);
+
+        navigate("/onboarding/login", {
+          state: {
+            successMessage:
+              "Registrasi berhasil! Silakan login dengan akun Anda.",
+          },
+        });
+      } else {
+        setRegisterApiError(result.message);
+
+        if (result.errors) {
+          setRegisterErrors((prev) => ({ ...prev, ...result.errors }));
+        }
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      setRegisterApiError(
+        "Terjadi kesalahan yang tidak terduga. Silakan coba lagi."
       );
-    case "welcome":
-      return (
-        <WelcomeScreen
-          onLogin={() => setMode("login")}
-          onRegister={() => setMode("register")}
-        />
-      );
-    case "login":
-      return (
-        <LoginScreen
-          formData={formData}
-          errors={errors}
-          rememberMe={rememberMe}
-          onBack={() => setMode("welcome")}
-          onSwitchToRegister={() => setMode("register")}
-          onFormChange={setFormData}
-          onRememberMeChange={setRememberMe}
-          onValidate={validate}
-          onSubmit={handleSubmit}
-        />
-      );
-    case "register":
-      return (
-        <RegisterScreen
-          formData={formData}
-          errors={errors}
-          onBack={() => setMode("welcome")}
-          onSwitchToLogin={() => setMode("login")}
-          onFormChange={setFormData}
-          onValidate={validate}
-          onSubmit={handleSubmit}
-        />
-      );
-    default:
-      return <OnboardingSlides />;
-  }
+    } finally {
+      setIsRegistering(false);
+    }
+  };
+
+  return (
+    <Routes>
+      {/* Default redirect to slides */}
+      <Route path="/" element={<Navigate to="slides" replace />} />
+
+      {/* Onboarding slides */}
+      <Route
+        path="slides"
+        element={
+          <OnboardingSlides
+            currentSlide={currentSlide}
+            onNext={handleNextSlide}
+            onPrevious={handlePreviousSlide}
+            onSkip={handleSkipSlides}
+          />
+        }
+      />
+
+      {/* Welcome screen */}
+      <Route
+        path="welcome"
+        element={
+          <WelcomeScreen
+            onLogin={handleGoToLogin}
+            onRegister={handleGoToRegister}
+          />
+        }
+      />
+
+      {/* Login screen */}
+      <Route
+        path="login"
+        element={
+          <LoginScreen
+            formData={loginFormData}
+            errors={loginErrors}
+            apiError={loginApiError}
+            loginSuccessMessage={loginSuccessMessage}
+            rememberMe={rememberMe}
+            isSubmitting={isLoggingIn}
+            onBack={handleBackToWelcome}
+            onSwitchToRegister={handleGoToRegister}
+            onFormChange={setLoginFormData}
+            onRememberMeChange={setRememberMe}
+            onValidate={validateLogin}
+            onSubmit={handleLoginSubmit}
+            onTermsClick={handleGoToTerms}
+            onPrivacyClick={handleGoToPrivacy}
+          />
+        }
+      />
+
+      {/* Register screen */}
+      <Route
+        path="register"
+        element={
+          <RegisterScreen
+            formData={registerFormData}
+            errors={registerErrors}
+            apiError={registerApiError}
+            isSubmitting={isRegistering}
+            agreeTerms={agreeTerms}
+            onBack={handleBackToWelcome}
+            onSwitchToLogin={handleGoToLogin}
+            onFormChange={setRegisterFormData}
+            onAgreeTermsChange={setAgreeTerms}
+            onValidate={validateRegister}
+            onSubmit={handleRegisterSubmit}
+            onTermsClick={handleGoToTerms}
+            onPrivacyClick={handleGoToPrivacy}
+          />
+        }
+      />
+
+      {/* Terms & Conditions */}
+      <Route
+        path="terms"
+        element={<TermsConditions onBack={() => navigate(-1)} />}
+      />
+
+      {/* Privacy Policy */}
+      <Route
+        path="privacy"
+        element={<PrivacyPolicy onBack={() => navigate(-1)} />}
+      />
+
+      {/* Redirect unknown routes to slides */}
+      <Route path="*" element={<Navigate to="slides" replace />} />
+    </Routes>
+  );
 };
 
 export default OnboardingAuth;

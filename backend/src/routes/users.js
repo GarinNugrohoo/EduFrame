@@ -4,9 +4,9 @@ const apikey = require("../middleware/apikey");
 
 router.use(apikey.validasiApi);
 
-router.get("/users", userController.getAll);
-router.get("/user/:id", userController.getById);
-router.post("/user/login", userController.login);
-router.post("/user/daftar", userController.register);
+router.get("/", userController.getAll);
+router.get("/:id", userController.getById);
+router.post("/login", userController.login);
+router.post("/daftar", userController.register);
 
 module.exports = router;

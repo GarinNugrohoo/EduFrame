@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   UserIcon,
@@ -13,22 +13,22 @@ import {
 import { ConfirmModal } from "../components/sections/ConfirmModal";
 import { ProfileSection } from "../components/sections/ProfileSection";
 import { DangerButton } from "../components/sections/DangerButton";
+import { formatProfileDate } from "../utils/dateFormatter";
 
 const Profile = () => {
   const navigate = useNavigate();
 
-  // State Management
   const [userData, setUserData] = useState({
-    name: "Garin Nugroho",
-    email: "garin@example.com",
-    joinDate: "15 Jan 2024",
+    name: "",
+    email: "",
+    joinDate: "",
     status: "active",
   });
 
   const [editMode, setEditMode] = useState(null);
   const [formData, setFormData] = useState({
-    name: userData.name,
-    email: userData.email,
+    name: "",
+    email: "",
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
@@ -43,7 +43,52 @@ const Profile = () => {
   const [modal, setModal] = useState({ show: false, type: "" });
   const [validationError, setValidationError] = useState("");
 
-  // Handlers
+  useEffect(() => {
+    const loadUserData = () => {
+      try {
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          const name = user.username || user.email.split("@")[0];
+          const email = user.email || "";
+
+          // Format tanggal join
+          let joinDate = "15 Jan 2024"; // default
+
+          if (user.created_at) {
+            joinDate = formatProfileDate(user.created_at);
+          } else if (user.createdAt) {
+            joinDate = formatProfileDate(user.createdAt);
+          } else if (user.loginTimestamp) {
+            joinDate = formatProfileDate(user.loginTimestamp);
+          }
+
+          setUserData({
+            name: name,
+            email: email,
+            joinDate: joinDate,
+            status: "active",
+          });
+
+          setFormData({
+            name: name,
+            email: email,
+            currentPassword: "",
+            newPassword: "",
+            confirmPassword: "",
+          });
+        } else {
+          navigate("/onboarding/login");
+        }
+      } catch (error) {
+        console.error("Error loading user data:", error);
+        navigate("/onboarding/login");
+      }
+    };
+
+    loadUserData();
+  }, [navigate]);
+
   const handleInputChange = useCallback((field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   }, []);
@@ -59,7 +104,13 @@ const Profile = () => {
             return;
           }
           setUserData((prev) => ({ ...prev, name: formData.name }));
+
+          const updatedUser = JSON.parse(localStorage.getItem("user") || "{}");
+          updatedUser.username = formData.name;
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+
           setEditMode(null);
+          alert("Nama berhasil diubah!");
           break;
 
         case "email":
@@ -73,7 +124,15 @@ const Profile = () => {
             return;
           }
           setUserData((prev) => ({ ...prev, email: formData.email }));
+
+          const updatedUserEmail = JSON.parse(
+            localStorage.getItem("user") || "{}"
+          );
+          updatedUserEmail.email = formData.email;
+          localStorage.setItem("user", JSON.stringify(updatedUserEmail));
+
           setEditMode(null);
+          alert("Email berhasil diubah!");
           break;
 
         case "password":
@@ -121,26 +180,39 @@ const Profile = () => {
   }, [userData]);
 
   const handleLogout = useCallback(() => {
-    console.log("Logging out...");
-    navigate("/login");
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    window.dispatchEvent(new Event("authChange"));
+    navigate("/onboarding/welcome", { replace: true });
     setModal({ show: false, type: "" });
   }, [navigate]);
 
   const handleDeleteAccount = useCallback(() => {
-    console.log("Deleting account...");
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    window.dispatchEvent(new Event("authChange"));
     alert("Akun berhasil dihapus");
-    navigate("/");
+    navigate("/onboarding/welcome", { replace: true });
     setModal({ show: false, type: "" });
   }, [navigate]);
 
-  // Toggle Password Visibility
   const togglePassword = useCallback((field) => {
     setShowPassword((prev) => ({ ...prev, [field]: !prev[field] }));
   }, []);
 
+  if (!userData.email) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Memuat data profil...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <div className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="max-w-2xl mx-auto">
           <h1 className="text-xl font-bold text-gray-900">Profile</h1>
@@ -148,8 +220,7 @@ const Profile = () => {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-6">
-        {/* Profile Card */}
+      <div className="max-w-2xl mx-auto px-4 py-6 mb-16">
         <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
           <div className="flex items-center gap-4">
             <div className="flex-1">
@@ -176,9 +247,7 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Profile Sections */}
         <div className="mb-8">
-          {/* Name Section */}
           <ProfileSection
             field="name"
             icon={UserIcon}
@@ -201,7 +270,6 @@ const Profile = () => {
             />
           </ProfileSection>
 
-          {/* Email Section */}
           <ProfileSection
             field="email"
             icon={EnvelopeIcon}
@@ -224,7 +292,6 @@ const Profile = () => {
             />
           </ProfileSection>
 
-          {/* Password Section */}
           <ProfileSection
             field="password"
             icon={LockIcon}
@@ -319,10 +386,9 @@ const Profile = () => {
           </ProfileSection>
         </div>
 
-        {/* Danger Zone */}
-        <div className="mb-8">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Aksi</h3>
-          <div className="space-y-3">
+        <div className="mb-10">
+          <h3 className="text-lg font-bold text-gray-900 mb-4 mt-10">Aksi</h3>
+          <div className="space-y-3 mt-5">
             <DangerButton
               icon={SignOutAltIcon}
               title="Keluar Akun"
@@ -341,7 +407,6 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Modals */}
       <ConfirmModal
         isOpen={modal.show && modal.type === "logout"}
         onClose={() => setModal({ show: false, type: "" })}

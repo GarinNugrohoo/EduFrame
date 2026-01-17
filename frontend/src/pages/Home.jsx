@@ -1,7 +1,6 @@
 // src/pages/Home.jsx
 import React, { useCallback, useMemo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import PropTypes from "prop-types";
 
 // Hooks
 import { useMotivationQuote } from "../hooks/useMotivationQuote";
@@ -14,10 +13,13 @@ import { CategoryCard } from "../components/sections/CategoryCard";
 import { LoadingSpinner } from "../components/sections/LoadingSpinner";
 import { ErrorDisplay } from "../components/sections/ErrorDisplay";
 
-const Home = ({ userName = "Garin Nugroho" }) => {
+const Home = () => {
   const navigate = useNavigate();
 
-  // State untuk kontrol UI (mencegah flash loading)
+  // State untuk user data dari localStorage
+  const [userName, setUserName] = useState("");
+
+  // State untuk kontrol UI
   const [showLoading, setShowLoading] = useState(true);
   const [initialLoad, setInitialLoad] = useState(true);
 
@@ -25,16 +27,43 @@ const Home = ({ userName = "Garin Nugroho" }) => {
   const motivationQuote = useMotivationQuote();
   const { categories, loading, error, refreshData } = useSubjectsData();
 
+  // Ambil data user dari localStorage saat komponen mount
+  useEffect(() => {
+    const loadUserData = () => {
+      try {
+        const userStr = localStorage.getItem("user");
+        if (userStr) {
+          const user = JSON.parse(userStr);
+
+          // Set username dari data user
+          if (user.username) {
+            setUserName(user.username);
+          } else if (user.email) {
+            const nameFromEmail = user.email.split("@")[0];
+            setUserName(nameFromEmail);
+          }
+        } else {
+          // Redirect ke login jika tidak ada user data
+          setTimeout(() => {
+            navigate("/onboarding/login");
+          }, 1000);
+        }
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+      }
+    };
+
+    loadUserData();
+  }, [navigate]);
+
   // Kontrol kapan menampilkan loading spinner
   useEffect(() => {
     if (initialLoad) {
-      // Initial load: tunggu 100ms baru tampilkan loading
       const timer = setTimeout(() => {
         setShowLoading(loading);
       }, 100);
       return () => clearTimeout(timer);
     } else {
-      // Subsequent loads: langsung tampilkan loading
       setShowLoading(loading);
     }
   }, [loading, initialLoad]);
@@ -80,20 +109,28 @@ const Home = ({ userName = "Garin Nugroho" }) => {
 
   const sectionTitle = useMemo(
     () => (
-      <div className="flex items-center justify-between mb-8 relative">
-        <div className="flex items-center">
-          <div className="relative">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
-              Struktur Belajar
-            </h2>
-          </div>
-        </div>
+      <div className="mb-8">
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+          Struktur Belajar
+        </h2>
       </div>
     ),
-    []
+    [userName]
   );
 
-  // Render loading state (hanya jika showLoading true)
+  // Render loading state jika belum ada user data
+  if (!userName && showLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-4 md:p-2 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Memuat data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Render loading state untuk konten
   if (showLoading && categories.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 p-4 md:p-2">
@@ -139,14 +176,6 @@ const Home = ({ userName = "Garin Nugroho" }) => {
       <div className="h-20"></div>
     </div>
   );
-};
-
-Home.propTypes = {
-  userName: PropTypes.string,
-};
-
-Home.defaultProps = {
-  userName: "Garin Nugroho",
 };
 
 export default Home;

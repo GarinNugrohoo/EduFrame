@@ -12,7 +12,7 @@ function BottomNavigation() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t py-3">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white py-3">
       <ul className="flex justify-around">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;

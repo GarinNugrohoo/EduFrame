@@ -1,19 +1,30 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./components/pages/Home";
-import Profile from "./components/pages/Profile";
-import BottomNavigation from "./components/navigations/BottomNavigation";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import OnboardingAuth from "./pages/OnboardingAuth";
+import Home from "./pages/Home";
+import Profile from "./pages/Profile";
 
 function App() {
+  const isAuthenticated = false; // Ganti dengan logika auth sesungguhnya
+
   return (
     <BrowserRouter>
-      {" "}
-      <div className="min-h-screen bg-gray-50 pb-16">
+      <div className="min-h-screen bg-gray-50">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route
+            path="/"
+            element={
+              isAuthenticated ? (
+                <Navigate to="/home" replace />
+              ) : (
+                <Navigate to="/onboarding" replace />
+              )
+            }
+          />
+          <Route path="/onboarding" element={<OnboardingAuth />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
+          {/* Tambahkan route lainnya */}
         </Routes>
-
-        <BottomNavigation />
       </div>
     </BrowserRouter>
   );

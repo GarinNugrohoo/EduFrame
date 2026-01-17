@@ -1,49 +1,32 @@
-import { Link, useLocation } from "react-router-dom";
-import logo from "../../assets/EduFrame.png";
-import { UserIcon } from "../icons/IkonWrapper";
+import PropTypes from "prop-types";
 
-const Header = () => {
-  const location = useLocation();
-  return (
-    <header className="bg-white shadow-lg border-b border-gray-100 px-4 py-3 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="relative">
-            <div className=" from-red-500 to-red-300 rounded-xl flex items-center justify-center shadow-md">
-              <img
-                src={logo}
-                alt="EduFrame Logo"
-                className="w-8 h-8 object-contain"
-              />
-            </div>
-            <div className="absolute inset-0 bg-red-800 rounded-xl opacity-20 blur-md -z-10"></div>
-          </div>
+export const Header = ({ userName, motivationQuote }) => (
+  <div className="relative mb-8 md:mb-12 p-5">
+    <div className="absolute -left-4 top-0 w-1 h-16 bg-gradient-to-b from-red-500 to-red-300 rounded-full"></div>
 
-          <div>
-            <h1 className="text-2xl font-bold bg-linear-to-r from-red-600 to-gray-600 bg-clip-text text-transparent">
-              EduFrame
-            </h1>
-            <p className="text-xs text-gray-500 -mt-1">
-              Platform Edukasi Modern
-            </p>
-          </div>
-        </div>
+    <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2 relative">
+      Selamat datang, <span className="text-red-600 italic">{userName}</span>
+      <span className="absolute -bottom-2 left-0 w-24 h-1 bg-gradient-to-r from-red-500 to-red-300 rounded-full"></span>
+    </h1>
 
-        <div className="flex items-center space-x-4">
-          <Link
-            to="/profile"
-            className={`w-10 h-10 rounded-full flex items-center justify-center shadow-md transition ${
-              location.pathname === "/profile"
-                ? "bg-linear-to-r from-red-500 to-red-300 ring-2 ring-red-300"
-                : "bg-linear-to-r from-red-400 to-red-200 hover:from-red-500 hover:to-red-300"
-            }`}
-          >
-            <UserIcon className="text-white" />
-          </Link>
-        </div>
-      </div>
-    </header>
-  );
+    <div className="flex items-center mt-4">
+      <svg
+        className="w-5 h-5 text-red-400 mr-2"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+      >
+        <path
+          fillRule="evenodd"
+          d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+          clipRule="evenodd"
+        />
+      </svg>
+      <p className="text-gray-600 italic">{motivationQuote}</p>
+    </div>
+  </div>
+);
+
+Header.propTypes = {
+  userName: PropTypes.string.isRequired,
+  motivationQuote: PropTypes.string.isRequired,
 };
-
-export default Header;

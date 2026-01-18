@@ -25,19 +25,17 @@ const LoginScreen = ({
   onRememberMeChange,
   onValidate,
   onSubmit,
-  loginSuccessMessage, // Tambah prop untuk success message
+  loginSuccessMessage,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [localSuccessMessage, setLocalSuccessMessage] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // Handle success message dari parent atau state lokal
   useEffect(() => {
     if (loginSuccessMessage) {
       setLocalSuccessMessage(loginSuccessMessage);
       setShowSuccess(true);
 
-      // Auto hide success message setelah 3 detik
       const timer = setTimeout(() => {
         setShowSuccess(false);
       }, 3000);
@@ -48,7 +46,6 @@ const LoginScreen = ({
 
   const handleInputChange = (field, value) => {
     onFormChange({ ...formData, [field]: value });
-    // Clear success message saat user mulai mengetik
     if (showSuccess) {
       setShowSuccess(false);
     }
@@ -296,7 +293,7 @@ LoginScreen.propTypes = {
   }).isRequired,
   errors: PropTypes.object,
   apiError: PropTypes.string,
-  loginSuccessMessage: PropTypes.string, // Tambah propTypes
+  loginSuccessMessage: PropTypes.string,
   rememberMe: PropTypes.bool,
   isSubmitting: PropTypes.bool,
   onBack: PropTypes.func.isRequired,

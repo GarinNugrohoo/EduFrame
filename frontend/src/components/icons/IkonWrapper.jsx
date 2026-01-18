@@ -49,6 +49,7 @@ import {
   FaTrophy,
   FaChevronCircleDown,
   FaChevronCircleUp,
+  FaStar,
 } from "react-icons/fa";
 
 import { FaXmark } from "react-icons/fa6";
@@ -104,6 +105,7 @@ export const PlayCircleIcon = (props) => <FaPlayCircle {...props} />;
 export const TrophyIcon = (props) => <FaTrophy {...props} />;
 export const ChevronDownIcon = (props) => <FaChevronCircleDown {...props} />;
 export const ChevronUpIcon = (props) => <FaChevronCircleUp {...props} />;
+export const StarIcon = (props) => <FaStar {...props} />;
 
 // Optional: Export juga FaIcons langsung jika ada yang perlu akses langsung
 export {

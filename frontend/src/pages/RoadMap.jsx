@@ -1,535 +1,15 @@
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  BookOpenIcon,
-  CheckCircleIcon,
-  PlayCircleIcon,
-  ClockIcon,
-  HomeIcon,
-  TrophyIcon,
-  VideoIcon,
-  FileTextIcon,
-  ChevronRightIcon,
-  XIcon,
-  ArrowLeftIcon,
-  ExternalLinkIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-} from "../components/icons/IkonWrapper";
-
-// DUMMY ROADMAP DATA dengan 2 semester (bisa dibuka/tutup)
-const ROADMAP_DATA = {
-  // ID 1: Matematika Wajib - 2 Semester
-  1: {
-    id: "1",
-    name: "Matematika Wajib",
-    code: "MAT",
-    description:
-      "Materi matematika wajib untuk kelas 11 semester ganjil dan genap",
-    grade_level: "11",
-    semester: "ganjil & genap",
-    color: "#4CAF50",
-    semesters: [
-      {
-        id: "semester-ganjil",
-        title: "Semester Ganjil",
-        isOpen: true,
-        materials: [
-          {
-            id: "m1-1",
-            title: "Persamaan Kuadrat",
-            description:
-              "Mempelajari konsep dasar persamaan kuadrat dan pemfaktoran",
-            type: "video",
-            duration: "25 menit",
-            youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-            progress: "not_started",
-            resources: ["PDF Materi", "Latihan Soal"],
-          },
-          {
-            id: "m1-2",
-            title: "Fungsi Linier",
-            description: "Memahami fungsi linier dan aplikasinya",
-            type: "article",
-            duration: "30 menit",
-            youtubeUrl: "https://www.youtube.com/watch?v=9bZkp7q19f0",
-            progress: "not_started",
-            resources: ["Video Penjelasan", "Kuis"],
-          },
-          {
-            id: "m1-3",
-            title: "Trigonometri Dasar",
-            description: "Pengenalan sinus, cosinus, dan tangen",
-            type: "video",
-            duration: "35 menit",
-            youtubeUrl: "https://www.youtube.com/watch?v=JGwWNGJdvx8",
-            progress: "not_started",
-            resources: ["Worksheet", "Simulasi"],
-          },
-        ],
-      },
-      {
-        id: "semester-genap",
-        title: "Semester Genap",
-        isOpen: false,
-        materials: [
-          {
-            id: "m1-4",
-            title: "Statistika Dasar",
-            description: "Mean, median, modus, dan penyajian data",
-            type: "article",
-            duration: "20 menit",
-            youtubeUrl: "https://www.youtube.com/watch?v=kffacxfA7G4",
-            progress: "not_started",
-            resources: ["PDF Materi", "Dataset Latihan"],
-          },
-          {
-            id: "m1-5",
-            title: "Peluang",
-            description: "Konsep dasar peluang dan probabilitas",
-            type: "video",
-            duration: "28 menit",
-            youtubeUrl: "https://www.youtube.com/watch?v=example1",
-            progress: "not_started",
-            resources: ["Simulasi", "Contoh Kasus"],
-          },
-          {
-            id: "m1-6",
-            title: "Logika Matematika",
-            description: "Pengenalan logika matematika dasar",
-            type: "article",
-            duration: "22 menit",
-            youtubeUrl: "https://www.youtube.com/watch?v=example2",
-            progress: "not_started",
-            resources: ["Diagram Logika", "Latihan"],
-          },
-        ],
-      },
-    ],
-    progress: {
-      completed: 0,
-      total: 6,
-      percentage: 0,
-    },
-  },
-};
-
-// RoadmapCard Component
-const RoadmapCard = ({
-  semester,
-  semesterNumber,
-  onMaterialClick,
-  isOpen,
-  onToggle,
-}) => {
-  const getProgressColor = (progress) => {
-    switch (progress) {
-      case "completed":
-        return "bg-green-500";
-      case "in_progress":
-        return "bg-yellow-500";
-      default:
-        return "bg-gray-300";
-    }
-  };
-
-  const getProgressText = (progress) => {
-    switch (progress) {
-      case "completed":
-        return "Selesai";
-      case "in_progress":
-        return "Sedang dipelajari";
-      default:
-        return "Belum mulai";
-    }
-  };
-
-  return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm mb-3">
-      <button
-        onClick={onToggle}
-        className="w-full bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200 px-4 py-3 text-left hover:bg-gray-100 transition-colors"
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-rose-700 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-white font-bold text-sm">
-                {semesterNumber}
-              </span>
-            </div>
-            <div className="text-left">
-              <h3 className="text-base font-bold text-gray-900">
-                {semester.title}
-              </h3>
-              <p className="text-xs text-gray-600">
-                {semester.materials.length} materi •{" "}
-                {isOpen ? "Terbuka" : "Tertutup"}
-              </p>
-            </div>
-          </div>
-          {isOpen ? (
-            <ChevronUpIcon className="w-5 h-5 text-gray-500" />
-          ) : (
-            <ChevronDownIcon className="w-5 h-5 text-gray-500" />
-          )}
-        </div>
-      </button>
-
-      {isOpen && (
-        <div className="p-3">
-          <div className="space-y-2">
-            {semester.materials.map((material, index) => (
-              <button
-                key={material.id}
-                onClick={() => onMaterialClick(material)}
-                className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-red-300 hover:bg-red-50/50 transition-all active:scale-[0.98]"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="shrink-0">
-                    <div
-                      className={`w-2 h-2 rounded-full mt-2 ${getProgressColor(
-                        material.progress
-                      )}`}
-                    ></div>
-                  </div>
-                  <div className="grow min-w-0">
-                    <div className="flex items-start justify-between gap-2 mb-1">
-                      <h4 className="text-sm font-semibold text-gray-900 line-clamp-1">
-                        {index + 1}. {material.title}
-                      </h4>
-                      <span className="text-xs text-gray-500 shrink-0">
-                        {getProgressText(material.progress)}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-600 mb-2 line-clamp-2">
-                      {material.description}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-1">
-                          {material.type === "video" ? (
-                            <VideoIcon className="w-3.5 h-3.5 text-red-500" />
-                          ) : (
-                            <FileTextIcon className="w-3.5 h-3.5 text-blue-500" />
-                          )}
-                          <span className="text-xs text-gray-600 capitalize">
-                            {material.type}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <ClockIcon className="w-3.5 h-3.5 text-gray-400" />
-                          <span className="text-xs text-gray-600">
-                            {material.duration}
-                          </span>
-                        </div>
-                      </div>
-                      <ChevronRightIcon className="w-4 h-4 text-gray-400" />
-                    </div>
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// MaterialModal Component - FIXED dengan null safety
-const MaterialModal = ({
-  isOpen,
-  onClose,
-  material,
-  onProgressUpdate,
-  onWatchYoutube,
-}) => {
-  // Default material untuk menghindari null
-  const safeMaterial = useMemo(() => {
-    return (
-      material || {
-        id: "",
-        title: "Materi",
-        description: "Deskripsi materi",
-        type: "video",
-        duration: "0 menit",
-        progress: "not_started",
-        youtubeUrl: "",
-        resources: [],
-      }
-    );
-  }, [material]);
-
-  const [selectedProgress, setSelectedProgress] = useState(
-    safeMaterial.progress || "not_started"
-  );
-  const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    if (isOpen && safeMaterial.progress) {
-      setSelectedProgress(safeMaterial.progress);
-    }
-  }, [isOpen, safeMaterial]);
-
-  const handleProgressChange = (progress) => {
-    setSelectedProgress(progress);
-  };
-
-  const handleSave = async () => {
-    if (!safeMaterial.id || selectedProgress === safeMaterial.progress) {
-      onClose();
-      return;
-    }
-
-    setIsSaving(true);
-    setTimeout(() => {
-      onProgressUpdate(safeMaterial.id, selectedProgress);
-      setIsSaving(false);
-      onClose();
-    }, 300);
-  };
-
-  const handleWatchClick = () => {
-    if (safeMaterial.youtubeUrl) {
-      onWatchYoutube(safeMaterial.youtubeUrl);
-    }
-  };
-
-  // Early return jika modal tidak open
-  if (!isOpen) return null;
-
-  const progressOptions = [
-    {
-      value: "not_started",
-      label: "Belum Mulai",
-      icon: BookOpenIcon,
-      color: "gray",
-    },
-    {
-      value: "in_progress",
-      label: "Sedang Dipelajari",
-      icon: PlayCircleIcon,
-      color: "yellow",
-    },
-    {
-      value: "completed",
-      label: "Selesai",
-      icon: CheckCircleIcon,
-      color: "green",
-    },
-  ];
-
-  const currentProgress = safeMaterial.progress || "not_started";
-  const hasChanged = selectedProgress !== currentProgress;
-
-  return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
-
-      <div className="flex min-h-full items-end justify-center p-0 md:items-center md:p-4">
-        <div className="relative bg-white w-full max-w-lg max-h-[90vh] overflow-hidden rounded-t-2xl md:rounded-2xl shadow-2xl">
-          <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-100 to-rose-200 flex items-center justify-center">
-                  {safeMaterial.type === "video" ? (
-                    <VideoIcon className="w-5 h-5 text-red-600" />
-                  ) : (
-                    <FileTextIcon className="w-5 h-5 text-blue-600" />
-                  )}
-                </div>
-                <div className="min-w-0">
-                  <h2 className="text-base font-bold text-gray-900 line-clamp-1">
-                    {safeMaterial.title}
-                  </h2>
-                  <p className="text-xs text-gray-600 line-clamp-1">
-                    {safeMaterial.description}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={onClose}
-                className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <XIcon className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-          </div>
-
-          <div className="overflow-y-auto max-h-[calc(90vh-140px)] p-4">
-            <div className="mb-6">
-              <h3 className="text-sm font-semibold text-gray-900 mb-3">
-                Status Pembelajaran
-              </h3>
-              <div className="grid grid-cols-3 gap-2">
-                {progressOptions.map((option) => {
-                  const Icon = option.icon;
-                  const isSelected = selectedProgress === option.value;
-                  const isCurrent = currentProgress === option.value;
-
-                  return (
-                    <button
-                      key={option.value}
-                      onClick={() => handleProgressChange(option.value)}
-                      className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all relative ${
-                        isSelected
-                          ? `border-${option.color}-500 bg-${option.color}-50`
-                          : "border-gray-200 hover:border-gray-300"
-                      } ${
-                        isCurrent ? "ring-2 ring-offset-1 ring-blue-400" : ""
-                      }`}
-                    >
-                      {isCurrent && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                          <span className="text-xs text-white">✓</span>
-                        </div>
-                      )}
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
-                          isSelected
-                            ? `bg-${option.color}-500 text-white`
-                            : "bg-gray-100 text-gray-400"
-                        }`}
-                      >
-                        <Icon className="w-4 h-4" />
-                      </div>
-                      <span className="text-xs font-medium text-gray-900">
-                        {option.label}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-              {hasChanged && (
-                <p className="text-xs text-gray-500 mt-2 text-center">
-                  Klik "Simpan Status" untuk mengubah
-                </p>
-              )}
-            </div>
-
-            <div className="mb-6">
-              <h3 className="text-sm font-semibold text-gray-900 mb-3">
-                Informasi Materi
-              </h3>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <div className="flex items-center gap-2 mb-1">
-                    <ClockIcon className="w-4 h-4 text-gray-500" />
-                    <span className="text-xs font-medium text-gray-700">
-                      Durasi
-                    </span>
-                  </div>
-                  <p className="text-sm font-bold text-gray-900">
-                    {safeMaterial.duration}
-                  </p>
-                </div>
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <div className="flex items-center gap-2 mb-1">
-                    {safeMaterial.type === "video" ? (
-                      <VideoIcon className="w-4 h-4 text-red-500" />
-                    ) : (
-                      <FileTextIcon className="w-4 h-4 text-blue-500" />
-                    )}
-                    <span className="text-xs font-medium text-gray-700">
-                      Tipe
-                    </span>
-                  </div>
-                  <p className="text-sm font-bold text-gray-900 capitalize">
-                    {safeMaterial.type}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {safeMaterial.resources && safeMaterial.resources.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">
-                  Materi Pendukung
-                </h3>
-                <div className="space-y-2">
-                  {safeMaterial.resources.map((resource, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-                          <FileTextIcon className="w-4 h-4 text-gray-500" />
-                        </div>
-                        <span className="text-sm text-gray-900">
-                          {resource}
-                        </span>
-                      </div>
-                      <button className="text-xs text-red-600 font-medium px-3 py-1 hover:bg-red-50 rounded-lg">
-                        Unduh
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {safeMaterial.youtubeUrl && (
-              <div className="mb-4">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">
-                  Video Pembelajaran
-                </h3>
-                <div
-                  className="relative rounded-xl overflow-hidden bg-gradient-to-br from-gray-900 to-black cursor-pointer active:scale-95 transition-transform"
-                  onClick={handleWatchClick}
-                >
-                  <div className="aspect-video flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <PlayCircleIcon className="w-6 h-6 text-white" />
-                      </div>
-                      <p className="text-white font-medium">
-                        Tonton di YouTube
-                      </p>
-                      <p className="text-gray-300 text-xs mt-1">
-                        Klik untuk membuka
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4">
-            <div className="flex gap-3">
-              <button
-                onClick={onClose}
-                disabled={isSaving}
-                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
-              >
-                Batal
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={isSaving || !hasChanged}
-                className={`flex-1 px-4 py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2 ${
-                  !hasChanged || isSaving
-                    ? "bg-gray-300 text-gray-700 cursor-not-allowed"
-                    : "bg-gradient-to-r from-green-600 to-emerald-700 text-white hover:from-green-700 hover:to-emerald-800"
-                }`}
-              >
-                {isSaving ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Menyimpan...
-                  </>
-                ) : (
-                  "Simpan Status"
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+import roadmapsDetail from "../api/roadmapsDetail";
+import RoadmapHeader from "../components/roadmap/RoadmapHeader";
+import ProgressStats from "../components/roadmap/ProgressStats";
+import SemesterList from "../components/roadmap/SemesterList";
+import LearningTips from "../components/roadmap/LearningTips";
+import UserStats from "../components/roadmap/UserStats";
+import MaterialModal from "../components/roadmap/MaterialModal";
+import LoadingState from "../components/roadmap/LoadingState";
+import ErrorState from "../components/roadmap/ErrorState";
+import { useTimeTracking } from "../hooks/useTimeTracking";
 
 const RoadMap = () => {
   const { subjectId } = useParams();
@@ -539,352 +19,414 @@ const RoadMap = () => {
   const [roadmapData, setRoadmapData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [openSemesters, setOpenSemesters] = useState({});
+  const [errorMessage, setErrorMessage] = useState(null);
 
-  useEffect(() => {
-    const fetchRoadmapData = () => {
+  const userId = React.useMemo(() => {
+    const userString = localStorage.getItem("user");
+    if (userString) {
       try {
-        setTimeout(() => {
-          const data = ROADMAP_DATA[subjectId];
-
-          if (data) {
-            const initialOpenState = {};
-            data.semesters.forEach((semester, index) => {
-              initialOpenState[semester.id] = index === 0;
-            });
-
-            setOpenSemesters(initialOpenState);
-            setRoadmapData(data);
-          } else {
-            setRoadmapData(null);
-          }
-
-          setLoading(false);
-        }, 800);
-      } catch (error) {
-        console.error("Error loading roadmap:", error);
-        setRoadmapData(null);
-        setLoading(false);
+        const user = JSON.parse(userString);
+        return user.id ? user.id.toString() : null;
+      } catch (e) {
+        return null;
       }
-    };
+    }
+    return localStorage.getItem("id");
+  }, []);
 
-    fetchRoadmapData();
-    localStorage.setItem("lastSubjectId", subjectId);
-  }, [subjectId]);
+  const {
+    startTrackingTime,
+    stopTrackingTime,
+    getTotalTimeSpent,
+    resetTimeTracking,
+    cleanupAllTimers,
+  } = useTimeTracking(userId);
+
+  const loadOpenSemestersFromStorage = useCallback(
+    (semesters) => {
+      if (!semesters || semesters.length === 0) return {};
+
+      const storageKey = `roadmap_${subjectId}_open_semesters_${userId}`;
+      const savedState = localStorage.getItem(storageKey);
+
+      let initialState = {};
+
+      if (savedState) {
+        try {
+          const parsed = JSON.parse(savedState);
+          semesters.forEach((semester) => {
+            if (parsed[semester.id] !== undefined) {
+              initialState[semester.id] = parsed[semester.id];
+            } else {
+              initialState[semester.id] = false;
+            }
+          });
+        } catch (e) {
+          semesters.forEach((semester) => {
+            initialState[semester.id] = false;
+          });
+        }
+      } else {
+        semesters.forEach((semester) => {
+          initialState[semester.id] = false;
+        });
+      }
+
+      return initialState;
+    },
+    [subjectId, userId],
+  );
+
+  const saveOpenSemestersToStorage = useCallback(
+    (openState) => {
+      const storageKey = `roadmap_${subjectId}_open_semesters_${userId}`;
+      localStorage.setItem(storageKey, JSON.stringify(openState));
+    },
+    [subjectId, userId],
+  );
+
+  const transformMaterialData = useCallback(
+    (material, userId) => {
+      let progressStatus = "not_started";
+      let timeSpentMinutes = 0;
+
+      if (material.user_progress) {
+        if (material.user_progress.progress_status) {
+          progressStatus = material.user_progress.progress_status;
+        }
+
+        if (material.user_progress.time_spent_minutes) {
+          const serverTime = parseInt(
+            material.user_progress.time_spent_minutes,
+          );
+          if (!isNaN(serverTime) && serverTime > 0) {
+            if (!(serverTime === 6 && material.id.toString() === "1")) {
+              timeSpentMinutes = serverTime;
+            }
+          }
+        }
+      }
+
+      if (userId && timeSpentMinutes === 0) {
+        const localStorageKey = `progress_${material.id}_${userId}`;
+        const localProgress = localStorage.getItem(localStorageKey);
+
+        if (localProgress) {
+          try {
+            const parsed = JSON.parse(localProgress);
+            let localMinutes = 0;
+
+            if (parsed.version === "2.0" && parsed.total_seconds) {
+              localMinutes = Math.floor(parsed.total_seconds / 60);
+            } else if (parsed.time_spent_minutes) {
+              localMinutes = parseInt(parsed.time_spent_minutes) || 0;
+            }
+
+            if (localMinutes > 0) {
+              if (!(localMinutes === 6 && material.id.toString() === "1")) {
+                timeSpentMinutes = localMinutes;
+              }
+            }
+
+            if (progressStatus === "not_started" && parsed.progress_status) {
+              progressStatus = parsed.progress_status;
+            }
+          } catch (e) {
+            // Silent error
+          }
+        }
+      }
+
+      if (timeSpentMinutes === 0 && userId) {
+        const realTimeMinutes = getTotalTimeSpent(material.id.toString());
+        if (realTimeMinutes > 0) {
+          timeSpentMinutes = realTimeMinutes;
+        }
+      }
+
+      return {
+        id: material.id.toString(),
+        title: material.title || "Materi",
+        description: material.description || "Deskripsi materi",
+        type: material.content_type || "video",
+        duration: material.duration_minutes
+          ? `${material.duration_minutes} menit`
+          : "0 menit",
+        youtubeUrl: material.youtube_url || "",
+        progress: progressStatus,
+        timeSpentMinutes,
+        resources: material.resources?.map((r) => r.title) || [],
+        resourceData: material.resources || [],
+        originalData: material,
+      };
+    },
+    [userId, getTotalTimeSpent, resetTimeTracking],
+  );
+
+  const transformRoadmapData = useCallback(
+    (roadmap) => {
+      if (!roadmap) {
+        return { openSemesters: {}, roadmapData: null };
+      }
+
+      const transformedSemesters =
+        roadmap.semesters?.map((semester, index) => {
+          const materials =
+            semester.materials?.map((material) => {
+              return transformMaterialData(material, userId);
+            }) || [];
+
+          return {
+            id: semester.id?.toString() || `sem-${index}`,
+            title: semester.title || `Semester ${semester.semester_number}`,
+            semester_number: semester.semester_number || index + 1,
+            materials: materials,
+            material_count: semester.material_count || materials.length,
+          };
+        }) || [];
+
+      let totalMaterials = 0;
+      let completedMaterials = 0;
+      let inProgressMaterials = 0;
+      let notStartedMaterials = 0;
+      let totalTimeSpent = 0;
+
+      transformedSemesters.forEach((semester) => {
+        semester.materials.forEach((material) => {
+          totalMaterials++;
+          totalTimeSpent += material.timeSpentMinutes;
+
+          switch (material.progress) {
+            case "completed":
+              completedMaterials++;
+              break;
+            case "in_progress":
+              inProgressMaterials++;
+              break;
+            default:
+              notStartedMaterials++;
+          }
+        });
+      });
+
+      const percentage =
+        totalMaterials > 0
+          ? Math.round((completedMaterials / totalMaterials) * 100)
+          : 0;
+
+      const savedOpenState = loadOpenSemestersFromStorage(transformedSemesters);
+
+      return {
+        openSemesters: savedOpenState,
+        roadmapData: {
+          id: roadmap.id?.toString() || "unknown",
+          name: roadmap.subject_name || roadmap.title || "Roadmap",
+          code: roadmap.subject_code || "SUB",
+          description: roadmap.description || "Deskripsi roadmap",
+          grade_level: roadmap.grade_level || "10",
+          semester: roadmap.subject_semester || "ganjil & genap",
+          color: roadmap.color || "#4CAF50",
+          semesters: transformedSemesters,
+          progress: {
+            completed: completedMaterials,
+            total: totalMaterials,
+            percentage,
+            in_progress: inProgressMaterials,
+            not_started: notStartedMaterials,
+            total_time_spent: totalTimeSpent,
+          },
+          total_hours: roadmap.total_hours || 0,
+          is_active: roadmap.is_active !== undefined ? roadmap.is_active : true,
+          created_at: roadmap.created_at,
+          updated_at: roadmap.updated_at,
+          user_stats: roadmap.user_stats || {
+            last_accessed: new Date().toISOString(),
+            total_time_spent: totalTimeSpent,
+          },
+        },
+      };
+    },
+    [transformMaterialData, userId, loadOpenSemestersFromStorage],
+  );
+
+  const fetchRoadmapData = useCallback(async () => {
+    if (!subjectId) {
+      setErrorMessage("ID mata pelajaran tidak valid");
+      setLoading(false);
+      return;
+    }
+
+    if (!userId) {
+      setErrorMessage("User tidak terautentikasi. Silakan login kembali.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setErrorMessage(null);
+
+      const response = await roadmapsDetail.getCompleteRoadmap(
+        subjectId,
+        userId,
+      );
+
+      if (response?.success && response.data) {
+        const transformedData = transformRoadmapData(response.data);
+        setOpenSemesters(transformedData.openSemesters);
+        setRoadmapData(transformedData.roadmapData);
+      } else {
+        setRoadmapData(null);
+        setErrorMessage(response?.message || "Roadmap tidak ditemukan");
+      }
+    } catch (error) {
+      setRoadmapData(null);
+      setErrorMessage("Gagal memuat roadmap. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
+    }
+  }, [subjectId, userId, transformRoadmapData]);
 
   useEffect(() => {
-    const handleBeforeUnload = () => {
-      localStorage.setItem("lastSubjectId", subjectId);
+    fetchRoadmapData();
+    return () => {
+      cleanupAllTimers();
     };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [subjectId]);
+  }, [fetchRoadmapData, cleanupAllTimers]);
 
   const handleMaterialClick = useCallback((material) => {
     setSelectedMaterial(material);
     setIsModalOpen(true);
   }, []);
 
-  const handleProgressUpdate = useCallback((materialId, newProgress) => {
-    setRoadmapData((prev) => {
-      if (!prev) return prev;
+  const handleProgressUpdate = useCallback(
+    async (materialId, newProgress) => {
+      if (!materialId || !userId) return;
 
-      const updatedSemesters = prev.semesters.map((semester) => ({
-        ...semester,
-        materials: semester.materials.map((material) =>
-          material.id === materialId
-            ? { ...material, progress: newProgress }
-            : material
-        ),
-      }));
+      try {
+        switch (newProgress) {
+          case "completed":
+            const minutesSpent =
+              stopTrackingTime(materialId) || getTotalTimeSpent(materialId);
+            await roadmapsDetail.completeMaterial(
+              materialId,
+              userId,
+              minutesSpent,
+            );
+            break;
 
-      const totalMaterials = updatedSemesters.reduce(
-        (total, semester) => total + semester.materials.length,
-        0
-      );
-      const completedMaterials = updatedSemesters.reduce(
-        (total, semester) =>
-          total +
-          semester.materials.filter((m) => m.progress === "completed").length,
-        0
-      );
+          case "in_progress":
+            await roadmapsDetail.resetMaterialProgress(materialId, userId);
+            await new Promise((resolve) => setTimeout(resolve, 100));
+            startTrackingTime(materialId);
+            await roadmapsDetail.startMaterial(materialId, userId);
+            break;
 
-      return {
-        ...prev,
-        semesters: updatedSemesters,
-        progress: {
-          total: totalMaterials,
-          completed: completedMaterials,
-          percentage: Math.round((completedMaterials / totalMaterials) * 100),
-        },
-      };
+          case "not_started":
+            await roadmapsDetail.resetMaterialProgress(materialId, userId);
+            resetTimeTracking(materialId, true);
+            break;
+
+          default:
+            await roadmapsDetail.updateUserProgress(materialId, userId, {
+              progress_status: newProgress,
+            });
+        }
+
+        fetchRoadmapData();
+      } catch (error) {
+        alert("Gagal menyimpan progress. Silakan coba lagi.");
+      }
+    },
+    [
+      userId,
+      startTrackingTime,
+      stopTrackingTime,
+      getTotalTimeSpent,
+      resetTimeTracking,
+      fetchRoadmapData,
+    ],
+  );
+
+  const handleToggleSemester = useCallback(
+    (semesterId) => {
+      setOpenSemesters((prev) => {
+        const newState = { ...prev, [semesterId]: !prev[semesterId] };
+        saveOpenSemestersToStorage(newState);
+        return newState;
+      });
+    },
+    [saveOpenSemestersToStorage],
+  );
+
+  const handleToggleAllSemesters = useCallback(() => {
+    if (!roadmapData) return;
+
+    const allOpen = Object.values(openSemesters).every((v) => v);
+    const newOpenState = {};
+
+    roadmapData.semesters.forEach((semester) => {
+      newOpenState[semester.id] = !allOpen;
     });
-  }, []);
 
-  const handleToggleSemester = useCallback((semesterId) => {
-    setOpenSemesters((prev) => ({
-      ...prev,
-      [semesterId]: !prev[semesterId],
-    }));
-  }, []);
-
-  const handleWatchYoutube = useCallback((url) => {
-    window.open(url, "_blank", "noopener,noreferrer");
-  }, []);
+    saveOpenSemestersToStorage(newOpenState);
+    setOpenSemesters(newOpenState);
+  }, [openSemesters, roadmapData, saveOpenSemestersToStorage]);
 
   const handleBackToHome = useCallback(() => {
     navigate("/home");
   }, [navigate]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Memuat roadmap...</p>
-        </div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
-  if (!roadmapData) {
+  if (!roadmapData || errorMessage) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="text-center">
-          <p className="text-gray-600 mb-4">Roadmap tidak ditemukan</p>
-          <button
-            onClick={handleBackToHome}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-          >
-            Kembali ke Beranda
-          </button>
-        </div>
-      </div>
+      <ErrorState
+        message={
+          errorMessage || "Roadmap untuk mata pelajaran ini belum tersedia."
+        }
+        onBack={handleBackToHome}
+        onRetry={fetchRoadmapData}
+      />
     );
   }
-
-  const progressColor = roadmapData.color || "#EF4444";
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      <div className="sticky top-0 z-10 bg-white border-b border-gray-200">
-        <div className="px-4 py-3">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleBackToHome}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
-            >
-              <ArrowLeftIcon className="w-5 h-5 text-gray-600" />
-            </button>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <div
-                  className="w-2 h-6 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: roadmapData.color }}
-                ></div>
-                <h1 className="text-lg font-bold text-gray-900 truncate">
-                  {roadmapData.name}
-                </h1>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-gray-600 flex-wrap">
-                <span className="px-1.5 py-0.5 bg-gray-100 rounded">
-                  {roadmapData.code}
-                </span>
-                <span>•</span>
-                <span>Kelas {roadmapData.grade_level}</span>
-                <span>•</span>
-                <span>{roadmapData.semester}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <RoadmapHeader
+        roadmapData={roadmapData}
+        onBack={handleBackToHome}
+        onRefresh={fetchRoadmapData}
+      />
 
       <div className="p-4">
         <div className="bg-white rounded-xl p-4 mb-4 border border-gray-200">
           <p className="text-sm text-gray-700">{roadmapData.description}</p>
         </div>
 
-        <div className="bg-white rounded-xl p-4 mb-6 border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-bold text-gray-900">
-              Progress Belajar
-            </h3>
-            <TrophyIcon className="w-5 h-5 text-yellow-500" />
-          </div>
+        <ProgressStats
+          progress={roadmapData.progress}
+          color={roadmapData.color}
+        />
 
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <div className="w-16 h-16">
-                <svg className="w-16 h-16 transform -rotate-90">
-                  <circle
-                    cx="32"
-                    cy="32"
-                    r="28"
-                    fill="none"
-                    stroke="#E5E7EB"
-                    strokeWidth="6"
-                  />
-                  <circle
-                    cx="32"
-                    cy="32"
-                    r="28"
-                    fill="none"
-                    stroke={progressColor}
-                    strokeWidth="6"
-                    strokeLinecap="round"
-                    strokeDasharray={`${
-                      roadmapData.progress.percentage * 1.76
-                    } 176`}
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-lg font-bold text-gray-900">
-                    {roadmapData.progress.percentage}%
-                  </span>
-                </div>
-              </div>
-            </div>
+        <SemesterList
+          semesters={roadmapData.semesters}
+          openSemesters={openSemesters}
+          onMaterialClick={handleMaterialClick}
+          onToggleSemester={handleToggleSemester}
+          onToggleAll={handleToggleAllSemesters}
+        />
 
-            <div className="flex-1">
-              <div className="mb-2">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm text-gray-700">Materi selesai</span>
-                  <span className="text-sm font-bold text-gray-900">
-                    {roadmapData.progress.completed}/
-                    {roadmapData.progress.total}
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="h-2 rounded-full transition-all duration-300"
-                    style={{
-                      width: `${roadmapData.progress.percentage}%`,
-                      backgroundColor: progressColor,
-                    }}
-                  ></div>
-                </div>
-              </div>
+        {roadmapData.user_stats && (
+          <UserStats
+            userStats={roadmapData.user_stats}
+            totalTimeSpent={roadmapData.progress.total_time_spent}
+          />
+        )}
 
-              <div className="grid grid-cols-3 gap-2">
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 mb-1">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-xs font-medium">
-                      {roadmapData.semesters.reduce(
-                        (acc, semester) =>
-                          acc +
-                          semester.materials.filter(
-                            (m) => m.progress === "completed"
-                          ).length,
-                        0
-                      )}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-600">Selesai</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 mb-1">
-                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                    <span className="text-xs font-medium">
-                      {roadmapData.semesters.reduce(
-                        (acc, semester) =>
-                          acc +
-                          semester.materials.filter(
-                            (m) => m.progress === "in_progress"
-                          ).length,
-                        0
-                      )}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-600">Sedang</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 mb-1">
-                    <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                    <span className="text-xs font-medium">
-                      {roadmapData.semesters.reduce(
-                        (acc, semester) =>
-                          acc +
-                          semester.materials.filter(
-                            (m) => m.progress === "not_started"
-                          ).length,
-                        0
-                      )}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-600">Belum</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-900">
-              Struktur Pembelajaran ({roadmapData.semesters.length} Semester)
-            </h2>
-            <button
-              onClick={() => {
-                const newOpenState = {};
-                const allOpen = Object.values(openSemesters).every((v) => v);
-                roadmapData.semesters.forEach((semester) => {
-                  newOpenState[semester.id] = !allOpen;
-                });
-                setOpenSemesters(newOpenState);
-              }}
-              className="text-xs text-red-600 font-medium px-3 py-1 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
-            >
-              {Object.values(openSemesters).every((v) => v)
-                ? "Tutup Semua"
-                : "Buka Semua"}
-            </button>
-          </div>
-
-          <div className="space-y-3">
-            {roadmapData.semesters.map((semester, index) => (
-              <RoadmapCard
-                key={semester.id}
-                semester={semester}
-                semesterNumber={index + 1}
-                onMaterialClick={handleMaterialClick}
-                isOpen={openSemesters[semester.id] || false}
-                onToggle={() => handleToggleSemester(semester.id)}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-r from-red-50 to-rose-50 rounded-xl p-4 border border-red-100">
-          <h3 className="text-base font-bold text-gray-900 mb-3">
-            Tips Belajar Efektif
-          </h3>
-          <div className="space-y-3">
-            <div className="flex items-start gap-3">
-              <ClockIcon className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
-              <div>
-                <h4 className="text-sm font-semibold text-gray-900">
-                  Belajar bertahap
-                </h4>
-                <p className="text-xs text-gray-600">
-                  Selesaikan satu materi sebelum lanjut ke materi berikutnya
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <PlayCircleIcon className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
-              <div>
-                <h4 className="text-sm font-semibold text-gray-900">
-                  Tonton dengan fokus
-                </h4>
-                <p className="text-xs text-gray-600">
-                  Matikan notifikasi saat menonton video pembelajaran
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <LearningTips />
       </div>
 
       <MaterialModal
@@ -892,7 +434,10 @@ const RoadMap = () => {
         onClose={() => setIsModalOpen(false)}
         material={selectedMaterial}
         onProgressUpdate={handleProgressUpdate}
-        onWatchYoutube={handleWatchYoutube}
+        getTotalTimeSpent={getTotalTimeSpent}
+        startTrackingTime={startTrackingTime}
+        stopTrackingTime={stopTrackingTime}
+        userId={userId}
       />
     </div>
   );

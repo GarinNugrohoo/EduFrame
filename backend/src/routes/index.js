@@ -9,6 +9,7 @@ const router = require("express").Router();
 const users = require("./users");
 const materi = require("./materi");
 const admins = require("./admins");
+const roadmaps = require("./roadmaps");
 const corsOptions = {
   origin: "http://192.168.1.9:5173",
   credentials: true,
@@ -20,5 +21,6 @@ router.use(cors(corsOptions));
 router.use("/api/users", users);
 router.use("/api/materi", materi);
 router.use("/api/admins", admins);
+router.use("/api/roadmaps", roadmaps);
 
 module.exports = router;

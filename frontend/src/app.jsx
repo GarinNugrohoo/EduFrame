@@ -7,6 +7,7 @@ import Profile from "./pages/Profile";
 import Navbar from "./components/navigations/Navbar";
 import BottomNavigation from "./components/navigations/BottomNavigation";
 import RoadMap from "./pages/RoadMap";
+import QuizPage from "./pages/QuizPage";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -115,7 +116,7 @@ function App() {
               isAuthenticated ? (
                 <>
                   <Navbar />
-
+                  <QuizPage />
                   <BottomNavigation />
                 </>
               ) : (

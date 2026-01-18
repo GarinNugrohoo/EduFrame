@@ -1,4 +1,3 @@
-// src/services/auth.js
 import axios from "axios";
 import { API_URL, API_KEY } from "../constants/api";
 
@@ -167,22 +166,6 @@ const auth = {
       return {
         success: false,
         message: "Gagal mengambil data user",
-      };
-    }
-  },
-
-  verifySession: async () => {
-    try {
-      const apiClient = createApiClient();
-      const response = await apiClient.get("/auth/verify");
-      return {
-        success: true,
-        data: response.data,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: "Session tidak valid",
       };
     }
   },

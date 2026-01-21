@@ -51,9 +51,7 @@ const Profile = () => {
           const user = JSON.parse(userStr);
           const name = user.username || user.email.split("@")[0];
           const email = user.email || "";
-
-          // Format tanggal join
-          let joinDate = "15 Jan 2024"; // default
+          let joinDate = "15 Jan 2026";
 
           if (user.created_at) {
             joinDate = formatProfileDate(user.created_at);
@@ -126,7 +124,7 @@ const Profile = () => {
           setUserData((prev) => ({ ...prev, email: formData.email }));
 
           const updatedUserEmail = JSON.parse(
-            localStorage.getItem("user") || "{}"
+            localStorage.getItem("user") || "{}",
           );
           updatedUserEmail.email = formData.email;
           localStorage.setItem("user", JSON.stringify(updatedUserEmail));
@@ -159,7 +157,7 @@ const Profile = () => {
           break;
       }
     },
-    [formData]
+    [formData],
   );
 
   const handleCancel = useCallback(() => {

@@ -132,7 +132,7 @@ const RoadMap = () => {
               progressStatus = parsed.progress_status;
             }
           } catch (e) {
-            // Silent error
+            throw e;
           }
         }
       }

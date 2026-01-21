@@ -219,15 +219,15 @@ const TermsConditions = ({ onBack }) => {
                 <p className="flex items-center gap-2">
                   <span className="font-medium">Email:</span>
                   <a
-                    href="mailto:legal@eduframe.com"
+                    href="mailto:garinnugroho0912@gmail.com"
                     className="text-red-600 hover:text-red-700"
                   >
-                    legal@eduframe.com
+                    garinnugroho0912@gmail.com
                   </a>
                 </p>
                 <p className="flex items-center gap-2">
                   <span className="font-medium">Alamat:</span>
-                  <span>Gedung EduFrame, Jl. Pendidikan No. 123, Jakarta</span>
+                  <span>SMAN 1 Gedeg</span>
                 </p>
                 <p className="flex items-center gap-2">
                   <span className="font-medium">Jam Operasional:</span>

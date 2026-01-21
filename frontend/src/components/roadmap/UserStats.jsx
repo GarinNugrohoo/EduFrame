@@ -1,4 +1,3 @@
-import React from "react";
 import { ClockIcon, CalendarIcon, UsersIcon } from "../icons/IkonWrapper";
 
 const UserStats = ({ userStats, totalTimeSpent }) => {

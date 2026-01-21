@@ -1,4 +1,3 @@
-// src/pages/OnboardingAuth.jsx
 import React, { useState } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import WelcomeScreen from "../components/onboarding/WelcomeScreen";
@@ -13,8 +12,6 @@ const OnboardingAuth = () => {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [loginSuccessMessage, setLoginSuccessMessage] = useState("");
-
-  // Login state
   const [loginFormData, setLoginFormData] = useState({
     email: "",
     password: "",
@@ -23,8 +20,6 @@ const OnboardingAuth = () => {
   const [loginApiError, setLoginApiError] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-
-  // Register state
   const [registerFormData, setRegisterFormData] = useState({
     username: "",
     email: "",
@@ -36,7 +31,6 @@ const OnboardingAuth = () => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
 
-  // Navigate functions
   const handleNextSlide = () => {
     if (currentSlide < 2) {
       setCurrentSlide(currentSlide + 1);
@@ -77,7 +71,6 @@ const OnboardingAuth = () => {
     navigate("/onboarding/privacy");
   };
 
-  // Form validation for login
   const validateLogin = (field, value) => {
     let error = "";
     switch (field) {
@@ -94,7 +87,6 @@ const OnboardingAuth = () => {
     return error === "";
   };
 
-  // Form validation for register
   const validateRegister = (field, value) => {
     let error = "";
     switch (field) {
@@ -123,7 +115,6 @@ const OnboardingAuth = () => {
     e.preventDefault();
     setLoginApiError("");
     setLoginSuccessMessage("");
-    // Validasi form
     const emailValid = validateLogin("email", loginFormData.email);
     const passwordValid = validateLogin("password", loginFormData.password);
 
@@ -141,7 +132,7 @@ const OnboardingAuth = () => {
 
       if (result.success) {
         setLoginSuccessMessage(
-          "Login berhasil! Mengalihkan ke halaman utama..."
+          "Login berhasil! Mengalihkan ke halaman utama...",
         );
 
         window.dispatchEvent(new Event("authChange"));
@@ -159,23 +150,22 @@ const OnboardingAuth = () => {
     }
   };
 
-  // Handle Register Submit dengan API
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     setRegisterApiError("");
 
     const usernameValid = validateRegister(
       "username",
-      registerFormData.username
+      registerFormData.username,
     );
     const emailValid = validateRegister("email", registerFormData.email);
     const passwordValid = validateRegister(
       "password",
-      registerFormData.password
+      registerFormData.password,
     );
     const confirmValid = validateRegister(
       "confirmPassword",
-      registerFormData.confirmPassword
+      registerFormData.confirmPassword,
     );
 
     if (!usernameValid || !emailValid || !passwordValid || !confirmValid) {
@@ -224,7 +214,7 @@ const OnboardingAuth = () => {
     } catch (error) {
       console.error("Registration error:", error);
       setRegisterApiError(
-        "Terjadi kesalahan yang tidak terduga. Silakan coba lagi."
+        "Terjadi kesalahan yang tidak terduga. Silakan coba lagi.",
       );
     } finally {
       setIsRegistering(false);

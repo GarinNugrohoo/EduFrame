@@ -1,5 +1,4 @@
-import React from "react";
-import { TrophyIcon, ClockIcon } from "../icons/IkonWrapper";
+import { TrophyIcon } from "../icons/IkonWrapper";
 
 const ProgressStats = ({ progress, color }) => {
   return (

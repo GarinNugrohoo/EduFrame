@@ -1,4 +1,3 @@
-import React from "react";
 import { XIcon } from "../icons/IkonWrapper";
 
 const ErrorState = ({ message, onBack, onRetry }) => (

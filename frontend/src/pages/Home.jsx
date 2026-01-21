@@ -1,12 +1,7 @@
-// src/pages/Home.jsx
 import React, { useCallback, useMemo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-// Hooks
 import { useMotivationQuote } from "../hooks/useMotivationQuote";
 import { useSubjectsData } from "../hooks/useSubjectsData";
-
-// Components
 import { BackgroundElements } from "../components/sections/BackgroundElements";
 import { Header } from "../components/sections/Header";
 import { CategoryCard } from "../components/sections/CategoryCard";
@@ -15,19 +10,12 @@ import { ErrorDisplay } from "../components/sections/ErrorDisplay";
 
 const Home = () => {
   const navigate = useNavigate();
-
-  // State untuk user data dari localStorage
   const [userName, setUserName] = useState("");
-
-  // State untuk kontrol UI
   const [showLoading, setShowLoading] = useState(true);
   const [initialLoad, setInitialLoad] = useState(true);
-
-  // Custom hooks
   const motivationQuote = useMotivationQuote();
   const { categories, loading, error, refreshData } = useSubjectsData();
 
-  // Ambil data user dari localStorage saat komponen mount
   useEffect(() => {
     const loadUserData = () => {
       try {
@@ -35,7 +23,6 @@ const Home = () => {
         if (userStr) {
           const user = JSON.parse(userStr);
 
-          // Set username dari data user
           if (user.username) {
             setUserName(user.username);
           } else if (user.email) {
@@ -43,7 +30,6 @@ const Home = () => {
             setUserName(nameFromEmail);
           }
         } else {
-          // Redirect ke login jika tidak ada user data
           setTimeout(() => {
             navigate("/onboarding/login");
           }, 1000);
@@ -56,7 +42,6 @@ const Home = () => {
     loadUserData();
   }, [navigate]);
 
-  // Kontrol kapan menampilkan loading spinner
   useEffect(() => {
     if (initialLoad) {
       const timer = setTimeout(() => {
@@ -68,26 +53,23 @@ const Home = () => {
     }
   }, [loading, initialLoad]);
 
-  // Set initialLoad menjadi false setelah data pertama kali dimuat
   useEffect(() => {
     if (!loading && categories.length > 0) {
       setInitialLoad(false);
     }
   }, [loading, categories]);
 
-  // Memoized handlers
   const handleStartLearning = useCallback(
     (subjectId) => {
       navigate(`/roadmap/${subjectId}`);
     },
-    [navigate]
+    [navigate],
   );
 
   const handleRetry = useCallback(() => {
     refreshData();
   }, [refreshData]);
 
-  // Memoized JSX elements
   const categoryCards = useMemo(() => {
     if (categories.length === 0 && !loading && !error) {
       return (
@@ -115,10 +97,9 @@ const Home = () => {
         </h2>
       </div>
     ),
-    [userName]
+    [userName],
   );
 
-  // Render loading state jika belum ada user data
   if (!userName && showLoading) {
     return (
       <div className="min-h-screen bg-gray-50 p-4 md:p-2 flex items-center justify-center">
@@ -130,7 +111,6 @@ const Home = () => {
     );
   }
 
-  // Render loading state untuk konten
   if (showLoading && categories.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 p-4 md:p-2">
@@ -141,7 +121,6 @@ const Home = () => {
     );
   }
 
-  // Render error state
   if (error && categories.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 p-4 md:p-2">
@@ -161,7 +140,6 @@ const Home = () => {
       <div className="relative mb-6">
         {sectionTitle}
 
-        {/* Loading indicator ringan jika ada data cache tapi sedang refresh */}
         {loading && categories.length > 0 && (
           <div className="flex justify-center mb-4">
             <div className="w-6 h-6 border-2 border-red-200 border-t-red-600 rounded-full animate-spin"></div>

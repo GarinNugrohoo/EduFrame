@@ -51,7 +51,6 @@ const useRegisterForm = (initialState = {}) => {
   const handleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Validasi realtime jika field sudah disentuh
     if (touched[name]) {
       const error = validateField(name, value);
       setErrors((prev) => ({ ...prev, [name]: error }));

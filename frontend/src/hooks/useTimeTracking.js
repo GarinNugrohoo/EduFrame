@@ -74,7 +74,7 @@ export const useTimeTracking = (userId) => {
           existingData = parsed;
         }
       } catch (e) {
-        // Silent error
+        throw e;
       }
     }
 

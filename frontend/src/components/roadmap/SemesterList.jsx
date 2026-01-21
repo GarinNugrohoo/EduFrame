@@ -1,4 +1,3 @@
-import React from "react";
 import SemesterCard from "./SemesterCard";
 
 const SemesterList = ({

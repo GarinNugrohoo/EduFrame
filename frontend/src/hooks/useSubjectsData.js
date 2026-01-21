@@ -10,17 +10,13 @@ export const useSubjectsData = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Gunakan useRef untuk menyimpan apakah sudah ada data
   const hasData = useRef(false);
 
   const fetchData = useCallback(async (force = false) => {
-    // 1. Jika sudah ada data di state dan tidak force refresh, skip
     if (hasData.current && !force) {
       return;
     }
 
-    // 2. Cek cache di localStorage
     if (!force) {
       const cached = localStorage.getItem(CACHE_KEY);
       if (cached) {
@@ -40,7 +36,6 @@ export const useSubjectsData = () => {
       }
     }
 
-    // 3. Jika tidak ada cache atau cache expired, fetch dari API
     try {
       setLoading(true);
       setError(null);
@@ -49,15 +44,11 @@ export const useSubjectsData = () => {
 
       if (apiData && Array.isArray(apiData) && apiData.length > 0) {
         const transformedData = transformSubjectsData(apiData);
-
-        // Simpan ke cache
         const cacheData = {
           data: transformedData,
           timestamp: Date.now(),
         };
         localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
-
-        // Update state
         setCategories(transformedData);
         hasData.current = true;
       } else {
@@ -67,7 +58,6 @@ export const useSubjectsData = () => {
       console.error("Fetch error:", err);
       setError("Gagal memuat data pelajaran. Silakan coba lagi.");
 
-      // Coba gunakan cache meski expired sebagai fallback
       const cached = localStorage.getItem(CACHE_KEY);
       if (cached) {
         try {
@@ -77,7 +67,7 @@ export const useSubjectsData = () => {
             hasData.current = true;
           }
         } catch (e) {
-          // Ignore cache error
+          throw e;
         }
       }
     } finally {
@@ -85,20 +75,17 @@ export const useSubjectsData = () => {
     }
   }, []);
 
-  // Initial fetch - hanya sekali
   useEffect(() => {
     if (!hasData.current) {
       fetchData();
     }
   }, [fetchData]);
 
-  // Function untuk manual refresh
   const refreshData = useCallback(() => {
-    hasData.current = false; // Reset flag
+    hasData.current = false;
     fetchData(true);
   }, [fetchData]);
 
-  // Function untuk clear cache
   const clearCache = useCallback(() => {
     localStorage.removeItem(CACHE_KEY);
     hasData.current = false;

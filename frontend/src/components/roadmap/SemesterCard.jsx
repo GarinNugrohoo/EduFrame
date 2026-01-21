@@ -1,4 +1,3 @@
-import React from "react";
 import MaterialItem from "./MaterialItem";
 import { ChevronDownIcon, ChevronUpIcon } from "../icons/IkonWrapper";
 

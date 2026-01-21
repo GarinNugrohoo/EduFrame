@@ -1,4 +1,3 @@
-// src/utils/subjectTransformer.js
 export const transformSubjectsData = (apiData) => {
   if (!apiData || !Array.isArray(apiData)) {
     return [];

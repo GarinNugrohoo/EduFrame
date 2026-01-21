@@ -1,4 +1,3 @@
-// src/App.js
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import OnboardingAuth from "./pages/OnboardingAuth";
@@ -8,6 +7,9 @@ import Navbar from "./components/navigations/Navbar";
 import BottomNavigation from "./components/navigations/BottomNavigation";
 import RoadMap from "./pages/RoadMap";
 import QuizPage from "./pages/QuizPage";
+import QuizPlayPage from "./components/quiz/QuizPlayPage";
+import QuizResultPage from "./components/quiz/QuizResultPage";
+import QuizHistoryPage from "./pages/QuizHistoryPage";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -52,7 +54,6 @@ function App() {
             }
           />
 
-          {/* Onboarding routes */}
           <Route
             path="/onboarding/*"
             element={
@@ -64,7 +65,6 @@ function App() {
             }
           />
 
-          {/* Main app routes */}
           <Route
             path="/home"
             element={
@@ -101,7 +101,7 @@ function App() {
               isAuthenticated ? (
                 <>
                   <Navbar />
-
+                  <QuizHistoryPage />
                   <BottomNavigation />
                 </>
               ) : (
@@ -124,6 +124,9 @@ function App() {
               )
             }
           />
+
+          <Route path="/quiz/:quizId/play" element={<QuizPlayPage />} />
+          <Route path="/quiz/:quizId/result" element={<QuizResultPage />} />
 
           <Route path="/roadmap/:subjectId" element={<RoadMap />} />
 

@@ -1,4 +1,3 @@
-// src/components/onboarding/LoginScreen.jsx
 import React, { useState, useEffect } from "react";
 import logo from "../../assets/EduFrame.png";
 import PropTypes from "prop-types";

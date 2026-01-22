@@ -74,13 +74,6 @@ const auth = {
 
         localStorage.setItem("user", JSON.stringify(userData));
 
-        if (response.data.token) {
-          localStorage.setItem("token", response.data.token);
-        }
-        if (response.data.data?.token) {
-          localStorage.setItem("token", response.data.data.token);
-        }
-
         return {
           success: true,
           data: response.data,
@@ -128,7 +121,6 @@ const auth = {
     } catch (error) {
     } finally {
       localStorage.removeItem("user");
-      localStorage.removeItem("token");
       window.location.href = "/onboarding";
     }
   },
@@ -172,7 +164,6 @@ const auth = {
 
   clearAuthData: () => {
     localStorage.removeItem("user");
-    localStorage.removeItem("token");
   },
 };
 

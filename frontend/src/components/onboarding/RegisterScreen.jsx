@@ -207,7 +207,7 @@ const RegisterScreen = ({
 
       <button
         onClick={onBack}
-        className="absolute top-4 md:top-6 left-4 md:left-6 lg:left-8 z-20 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-all duration-200 group"
+        className="absolute top-4 md:top-6 left-4 md:left-6 lg:left-8 z-20 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-all duration-200 group "
       >
         <ArrowLeftIcon className="w-5 h-5 md:w-6 md:h-6 group-hover:-translate-x-1 transition-transform" />
         <span className="text-sm md:text-base font-medium hidden md:inline">
@@ -215,60 +215,10 @@ const RegisterScreen = ({
         </span>
       </button>
 
-      <div className="w-full max-w-6xl relative z-10">
-        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-          <div className="lg:w-2/5 xl:w-2/5">
-            <div className="h-full flex flex-col">
-              <div className="mb-6 lg:mb-8">
-                <div className="inline-flex items-center gap-4 mb-6 mt-15">
-                  <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-red-100 to-rose-200 rounded-2xl md:rounded-3xl shadow-lg flex items-center justify-center">
-                    <img
-                      src={logo}
-                      className="w-8 h-8 md:w-10 md:h-10"
-                      alt="EduFrame Logo"
-                    />
-                  </div>
-                  <div>
-                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                      EduFrame
-                    </h1>
-                    <p className="text-gray-600 text-sm md:text-base">
-                      Platform Pembelajaran Digital
-                    </p>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                  <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-6">
-                    Kenapa Bergabung?
-                  </h2>
-                  <div className="space-y-4">
-                    {benefits.map((benefit, index) => (
-                      <div
-                        key={index}
-                        className="flex items-start gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors duration-200"
-                      >
-                        <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-red-500/10 to-rose-600/10 rounded-xl flex items-center justify-center">
-                          <div className="text-red-600">{benefit.icon}</div>
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-gray-900 mb-1">
-                            {benefit.title}
-                          </h3>
-                          <p className="text-gray-600 text-sm">
-                            {benefit.description}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
+      <div className="w-full max-w-6xl relative z-10 mt-15">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-5">
           <div className="lg:w-3/5 xl:w-3/5">
-            <div className="bg-white rounded-2xl md:rounded-3xl shadow-xl border border-gray-200/50 p-6 md:p-8 lg:p-10">
+            <div className="bg-white rounded-2xl md:rounded-3xl shadow-xl border border-gray-200/50 p-10 md:p-10 lg:p-10">
               <div className="mb-8 lg:mb-10">
                 <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
                   Buat Akun Baru
@@ -412,10 +362,10 @@ const RegisterScreen = ({
                               passwordStrength.level === 1
                                 ? "text-red-600"
                                 : passwordStrength.level === 2
-                                ? "text-yellow-600"
-                                : passwordStrength.level === 3
-                                ? "text-green-600"
-                                : "text-gray-600"
+                                  ? "text-yellow-600"
+                                  : passwordStrength.level === 3
+                                    ? "text-green-600"
+                                    : "text-gray-600"
                             }`}
                           >
                             {passwordStrength.text}

@@ -1,7 +1,6 @@
 const RoadmapsModel = require("../models/roadmaps");
 
 class RoadmapsController {
-  // Get all roadmaps
   static async getAll(req, res) {
     try {
       const data = await RoadmapsModel.getAll();
@@ -20,7 +19,6 @@ class RoadmapsController {
     }
   }
 
-  // Get roadmap by ID
   static async getById(req, res) {
     try {
       const { id } = req.params;
@@ -40,7 +38,6 @@ class RoadmapsController {
     }
   }
 
-  // Get roadmaps by subject ID
   static async getBySubjectId(req, res) {
     try {
       const { subject_id } = req.params;
@@ -60,7 +57,6 @@ class RoadmapsController {
     }
   }
 
-  // Create new roadmap
   static async create(req, res) {
     try {
       const roadmapData = req.body;
@@ -80,7 +76,6 @@ class RoadmapsController {
     }
   }
 
-  // Update roadmap
   static async update(req, res) {
     try {
       const { id } = req.params;
@@ -104,7 +99,6 @@ class RoadmapsController {
     }
   }
 
-  // Delete roadmap
   static async delete(req, res) {
     try {
       const { id } = req.params;
@@ -124,7 +118,6 @@ class RoadmapsController {
     }
   }
 
-  // Get active roadmaps only
   static async getActive(req, res) {
     try {
       const data = await RoadmapsModel.getActive();
@@ -143,7 +136,6 @@ class RoadmapsController {
     }
   }
 
-  // Get roadmap with all details
   static async getRoadmapWithDetails(req, res) {
     try {
       const { id } = req.params;

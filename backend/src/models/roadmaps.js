@@ -1,7 +1,6 @@
 const db = require("../config/database");
 
 class roadmaps {
-  // Get all roadmaps
   static async getAll() {
     try {
       const query = `
@@ -30,7 +29,6 @@ class roadmaps {
     }
   }
 
-  // Get roadmap by ID
   static async getById(id) {
     try {
       const query = `
@@ -59,7 +57,6 @@ class roadmaps {
     }
   }
 
-  // Get roadmaps by subject ID
   static async getBySubjectId(subject_id) {
     try {
       const query = `
@@ -89,7 +86,6 @@ class roadmaps {
     }
   }
 
-  // Create new roadmap
   static async create(roadmapData) {
     try {
       const {
@@ -100,7 +96,6 @@ class roadmaps {
         is_active = true,
       } = roadmapData;
 
-      // Check if subject exists
       const checkSubjectQuery = "SELECT id FROM subjects WHERE id = ?";
       const [subjectCheck] = await db.query(checkSubjectQuery, [subject_id]);
 
@@ -137,13 +132,11 @@ class roadmaps {
     }
   }
 
-  // Update roadmap
   static async update(id, roadmapData) {
     try {
       const { subject_id, title, description, total_hours, is_active } =
         roadmapData;
 
-      // Check if roadmap exists
       const checkQuery = "SELECT id FROM roadmaps WHERE id = ?";
       const [checkResult] = await db.query(checkQuery, [id]);
 
@@ -154,7 +147,6 @@ class roadmaps {
         };
       }
 
-      // Check if subject exists
       if (subject_id) {
         const checkSubjectQuery = "SELECT id FROM subjects WHERE id = ?";
         const [subjectCheck] = await db.query(checkSubjectQuery, [subject_id]);
@@ -167,7 +159,6 @@ class roadmaps {
         }
       }
 
-      // Build dynamic update query
       let updateFields = [];
       let values = [];
 
@@ -219,7 +210,6 @@ class roadmaps {
     }
   }
 
-  // Delete roadmap
   static async delete(id) {
     try {
       const checkQuery = "SELECT id FROM roadmaps WHERE id = ?";
@@ -244,7 +234,6 @@ class roadmaps {
     }
   }
 
-  // Get active roadmaps only
   static async getActive() {
     try {
       const query = `
@@ -274,10 +263,8 @@ class roadmaps {
     }
   }
 
-  // Get roadmap with all details (semesters, materials)
   static async getRoadmapWithDetails(id) {
     try {
-      // Get roadmap basic info
       const roadmapQuery = `
         SELECT r.*, s.name as subject_name, s.code as subject_code 
         FROM roadmaps r
@@ -294,7 +281,6 @@ class roadmaps {
         };
       }
 
-      // Get semesters
       const semestersQuery = `
         SELECT * FROM semesters 
         WHERE roadmap_id = ? 
@@ -302,7 +288,6 @@ class roadmaps {
       `;
       const [semesters] = await db.query(semestersQuery, [id]);
 
-      // Get materials for each semester
       for (let semester of semesters) {
         const materialsQuery = `
           SELECT m.*, 
@@ -314,7 +299,6 @@ class roadmaps {
         const [materials] = await db.query(materialsQuery, [semester.id]);
         semester.materials = materials;
 
-        // Get resources for each material
         for (let material of materials) {
           if (material.resource_count > 0) {
             const resourcesQuery = `

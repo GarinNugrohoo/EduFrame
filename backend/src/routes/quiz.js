@@ -30,17 +30,5 @@ router.get("/results/user/:user_id/stats", resultController.getUserStats);
 router.get("/results/user/:user_id/recent", resultController.getRecentAttempts);
 router.get("/results/leaderboard/:quiz_id", resultController.getLeaderboard);
 router.delete("/results/:id", resultController.deleteResult);
-// Admin routes
-// const adminRouter = express.Router();
-// adminRouter.post("/", quizController.createQuiz);
-// adminRouter.put("/:id", quizController.updateQuiz);
-// adminRouter.delete("/:id", quizController.deleteQuiz);
-// adminRouter.post("/:quiz_id/questions", questionController.createQuestion);
-// adminRouter.post(
-//   "/:quiz_id/questions/batch",
-//   questionController.createBatchQuestions,
-// );
-// adminRouter.put("/questions/:id", questionController.updateQuestion);
-// adminRouter.delete("/questions/:id", questionController.deleteQuestion);
 
 module.exports = router;

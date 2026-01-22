@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import PropTypes from "prop-types";
 import logo from "../../assets/EduFrame.png";
 import { UserIcon } from "../icons/IkonWrapper";
 
@@ -43,7 +42,7 @@ const Navbar = () => {
   const navItems = [
     { path: "/home", label: "Beranda" },
     { path: "/quiz", label: "Quiz" },
-    { path: "/history", label: "History" },
+    { path: "/panduan", label: "Panduan" },
     { path: "/profile", label: "Profile" },
   ];
 

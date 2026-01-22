@@ -1,97 +1,158 @@
 import axios from "axios";
 import { API_URL, API_KEY } from "../constants/api";
 
-const createApiClient = () => {
-  return axios.create({
-    baseURL: API_URL,
-    headers: {
-      "Content-Type": "application/json",
-      apikey: API_KEY,
-    },
-    withCredentials: true,
-    timeout: 10000,
-  });
-};
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    "Content-Type": "application/json",
+    apikey: API_KEY,
+  },
+  withCredentials: true,
+  timeout: 15000,
+});
 
-const api = createApiClient();
-
-export const getUserId = () => {
-  const userString = localStorage.getItem("user");
-  if (!userString) return null;
-
-  const user = JSON.parse(userString);
-  const userId = user?.id || user?.user_id || user?.userId;
-  return userId ? String(userId) : null;
-};
-
-export const getQuizResultsFromLocal = () => {
-  const results = localStorage.getItem("quiz_results");
-  return results ? JSON.parse(results) : [];
-};
-
-// Fungsi helper untuk menghapus circular references
-const removeCircularReferences = (obj) => {
-  const seen = new Set();
-  return JSON.parse(
-    JSON.stringify(obj, (key, value) => {
-      if (typeof value === "object" && value !== null) {
-        if (seen.has(value)) {
-          return undefined;
-        }
-        seen.add(value);
-      }
-      return value;
-    }),
-  );
-};
-
-export const saveQuizResultToLocal = (quizId, resultData) => {
+const getUserId = () => {
   try {
+    const userString = localStorage.getItem("user");
+    if (!userString) return null;
+
+    const user = JSON.parse(userString);
+    const userId = user?.id || user?.user_id || user?.userId;
+
+    if (!userId) return null;
+
+    return String(userId);
+  } catch (error) {
+    return null;
+  }
+};
+
+const getQuizResultsFromLocal = (userId = null) => {
+  try {
+    const targetUserId = userId || getUserId() || "anonymous";
+    const storageKey = `quiz_results_${targetUserId}`;
+
+    const results = localStorage.getItem(storageKey);
+    if (!results) return [];
+
+    const parsedResults = JSON.parse(results);
+    return Array.isArray(parsedResults) ? parsedResults : [];
+  } catch (error) {
+    return [];
+  }
+};
+
+const saveQuizResultToLocal = (resultData) => {
+  try {
+    const userId = resultData.user_id || getUserId() || "anonymous";
+    const storageKey = `quiz_results_${userId}`;
+
     const cleanData = {
-      quiz_id: quizId,
-      score: resultData.score,
-      total_questions: resultData.total_questions,
-      correct_answers: resultData.correct_answers,
-      total_points: resultData.total_points,
-      earned_points: resultData.earned_points || 0,
-      time_spent_seconds: resultData.time_spent_seconds,
-      answers_data: resultData.answers_data,
+      quiz_id: Number(resultData.quiz_id) || 0,
+      user_id: userId,
+      score: Number(resultData.score) || 0,
+      total_questions: Number(resultData.total_questions) || 0,
+      correct_answers: Number(resultData.correct_answers) || 0,
+      total_points: Number(resultData.total_points) || 0,
+      earned_points: Number(resultData.earned_points) || 0,
+      time_taken:
+        Number(resultData.time_taken) ||
+        Number(resultData.time_spent_seconds) ||
+        0,
+      answers_data:
+        typeof resultData.answers_data === "string"
+          ? resultData.answers_data
+          : JSON.stringify(resultData.answers_data || []),
       completed_at: resultData.completed_at || new Date().toISOString(),
       saved_at: new Date().toISOString(),
       id: Date.now(),
+      server_saved: resultData.server_saved || false,
+      error: resultData.error || null,
     };
 
-    const savedResults = getQuizResultsFromLocal();
+    const savedResults = JSON.parse(localStorage.getItem(storageKey) || "[]");
     savedResults.push(cleanData);
 
-    localStorage.setItem("quiz_results", JSON.stringify(savedResults));
+    localStorage.setItem(storageKey, JSON.stringify(savedResults));
+
     return true;
   } catch (error) {
-    console.error("Error saving to local:", error);
     return false;
   }
 };
 
-export const getQuizResultFromLocal = (quizId) => {
-  const userId = getUserId();
-  if (!userId) return null;
+const handleApiError = (error, defaultMessage) => {
+  const errorResponse = {
+    success: false,
+    message: defaultMessage,
+    data: null,
+    error: error.message,
+  };
 
-  const key = `quiz_results_${userId}_${quizId}`;
-  const result = localStorage.getItem(key);
-  return result ? JSON.parse(result) : null;
+  if (error.response) {
+    errorResponse.status = error.response.status;
+    errorResponse.data = error.response.data;
+  } else if (error.request) {
+    errorResponse.message = "Tidak ada response dari server";
+  }
+
+  return errorResponse;
 };
 
-export const getAllUserResultsFromLocal = () => {
+const validateQuizData = (data) => {
+  const errors = [];
   const userId = getUserId();
-  if (!userId) return [];
 
-  const key = `quiz_results_${userId}`;
-  const results = localStorage.getItem(key);
-  return results ? JSON.parse(results) : [];
+  if (!data.quiz_id || Number(data.quiz_id) <= 0) {
+    errors.push("Quiz ID harus diisi");
+  }
+
+  if (
+    data.score === undefined ||
+    data.score === null ||
+    isNaN(Number(data.score))
+  ) {
+    errors.push("Score harus diisi");
+  }
+
+  if (!data.answers_data) {
+    errors.push("Data jawaban harus diisi");
+  } else if (typeof data.answers_data === "string") {
+    try {
+      JSON.parse(data.answers_data);
+    } catch {
+      errors.push("Data jawaban tidak valid");
+    }
+  }
+
+  if (!userId) {
+    errors.push("User tidak login");
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors: errors,
+    validatedData: {
+      quiz_id: Number(data.quiz_id) || 0,
+      user_id: userId,
+      score: Number(data.score) || 0,
+      total_questions: Number(data.total_questions) || 0,
+      correct_answers: Number(data.correct_answers) || 0,
+      total_points: Number(data.total_points) || 0,
+      earned_points: Number(data.earned_points) || 0,
+      time_taken:
+        Number(data.time_taken) || Number(data.time_spent_seconds) || 0,
+      answers_data:
+        typeof data.answers_data === "string"
+          ? data.answers_data
+          : JSON.stringify(data.answers_data || []),
+      completed_at: data.completed_at || new Date().toISOString(),
+    },
+  };
 };
 
-const calculateUserStats = (results) => {
-  if (!results || results.length === 0) {
+const calculateStatsFromLocal = (localResults) => {
+  if (!localResults || localResults.length === 0) {
     return {
       success: true,
       data: {
@@ -105,13 +166,13 @@ const calculateUserStats = (results) => {
     };
   }
 
-  const totalAttempts = results.length;
-  const totalScore = results.reduce((sum, r) => sum + (r.score || 0), 0);
-  const totalCorrect = results.reduce(
+  const totalAttempts = localResults.length;
+  const totalScore = localResults.reduce((sum, r) => sum + (r.score || 0), 0);
+  const totalCorrect = localResults.reduce(
     (sum, r) => sum + (r.correct_answers || 0),
     0,
   );
-  const totalQuestions = results.reduce(
+  const totalQuestions = localResults.reduce(
     (sum, r) => sum + (r.total_questions || 0),
     0,
   );
@@ -132,15 +193,6 @@ const calculateUserStats = (results) => {
       total_questions: totalQuestions,
       accuracy: accuracy,
     },
-  };
-};
-
-const handleApiError = (error, defaultMessage) => {
-  console.error(defaultMessage, error.response?.data || error.message);
-  return {
-    success: false,
-    message: defaultMessage,
-    data: null,
   };
 };
 
@@ -175,24 +227,6 @@ export const quiz = {
   getQuizWithQuestions: async (quizId) => {
     try {
       const response = await api.get(`/quizzes/${quizId}/with-questions`);
-
-      if (response.data.success && response.data.data) {
-        const quizData = response.data.data;
-        const questions = quizData.questions || quizData.question || [];
-
-        if (!questions || questions.length === 0) {
-          return {
-            success: false,
-            message: "Kuis tidak memiliki soal",
-            data: null,
-          };
-        }
-
-        if (!quizData.total_questions) {
-          quizData.total_questions = questions.length;
-        }
-      }
-
       return response.data;
     } catch (error) {
       return handleApiError(error, "Gagal mengambil soal kuis");
@@ -221,77 +255,85 @@ export const quiz = {
 
   submitQuizResult: async (resultData) => {
     try {
-      // Bersihkan data dari circular references
-      const cleanResultData = removeCircularReferences({
+      const validation = validateQuizData(resultData);
+
+      if (!validation.isValid) {
+        const errorData = {
+          ...validation.validatedData,
+          error: validation.errors.join(", "),
+          server_saved: false,
+        };
+
+        saveQuizResultToLocal(errorData);
+
+        return {
+          success: false,
+          message: validation.errors.join(", "),
+          data: errorData,
+        };
+      }
+
+      const response = await api.post(
+        "/quizzes/results/submit",
+        validation.validatedData,
+      );
+
+      if (response.data && response.data.success) {
+        const successData = {
+          ...validation.validatedData,
+          server_saved: true,
+          server_id: response.data.data?.id || null,
+        };
+
+        saveQuizResultToLocal(successData);
+
+        return {
+          ...response.data,
+          data: successData,
+        };
+      } else {
+        const errorData = {
+          ...validation.validatedData,
+          error: response.data?.message || "Unknown server error",
+          server_saved: false,
+        };
+
+        saveQuizResultToLocal(errorData);
+
+        return {
+          success: false,
+          message: response.data?.message || "Unknown server error",
+          data: errorData,
+        };
+      }
+    } catch (error) {
+      const errorData = {
         quiz_id: Number(resultData.quiz_id) || 0,
+        user_id: resultData.user_id || getUserId(),
         score: Number(resultData.score) || 0,
         total_questions: Number(resultData.total_questions) || 0,
         correct_answers: Number(resultData.correct_answers) || 0,
         total_points: Number(resultData.total_points) || 0,
         earned_points: Number(resultData.earned_points) || 0,
-        time_spent_seconds: Number(resultData.time_spent_seconds) || 0,
+        time_taken:
+          Number(resultData.time_taken) ||
+          Number(resultData.time_spent_seconds) ||
+          0,
         answers_data:
           typeof resultData.answers_data === "string"
             ? resultData.answers_data
             : JSON.stringify(resultData.answers_data || []),
         completed_at: resultData.completed_at || new Date().toISOString(),
-      });
-
-      const userId = getUserId();
-      if (!userId) {
-        throw new Error("User tidak login");
-      }
-
-      const completeData = {
-        ...cleanResultData,
-        user_id: userId,
+        error: error.response?.data?.message || error.message,
+        server_saved: false,
       };
 
-      console.log("Data yang dikirim ke API:", completeData);
+      saveQuizResultToLocal(errorData);
 
-      const response = await api.post("/quizzes/results/submit", completeData);
-
-      console.log("API Response:", response.data);
-
-      if (response.data.success) {
-        saveQuizResultToLocal(resultData.quiz_id, cleanResultData);
-      }
-
-      return response.data;
-    } catch (error) {
-      console.error("Submit API Error:", error.message);
-      console.error("Error status:", error.response?.status);
-      console.error("Error data:", error.response?.data);
-
-      if (error.response?.data) {
-        console.error("Server error message:", error.response.data.message);
-        console.error("Server error details:", error.response.data.errors);
-      }
-
-      // Simpan ke localStorage saja
-      const cleanResultData = removeCircularReferences({
-        quiz_id: Number(resultData.quiz_id) || 0,
-        score: Number(resultData.score) || 0,
-        total_questions: Number(resultData.total_questions) || 0,
-        correct_answers: Number(resultData.correct_answers) || 0,
-        total_points: Number(resultData.total_points) || 0,
-        earned_points: Number(resultData.earned_points) || 0,
-        time_spent_seconds: Number(resultData.time_spent_seconds) || 0,
-        answers_data:
-          typeof resultData.answers_data === "string"
-            ? resultData.answers_data
-            : JSON.stringify(resultData.answers_data || []),
-        completed_at: resultData.completed_at || new Date().toISOString(),
-        user_id: getUserId(),
-        error: error.message,
-        saved_locally: true,
-      });
-
-      saveQuizResultToLocal(resultData.quiz_id, cleanResultData);
       return {
         success: true,
-        message: "Hasil disimpan secara lokal",
-        data: cleanResultData,
+        message: "Hasil disimpan secara lokal karena server error",
+        data: errorData,
       };
     }
   },
@@ -309,23 +351,19 @@ export const quiz = {
 
       const response = await api.get(`/quizzes/results/user/${targetUserId}`);
 
-      if (response.data.success && response.data.data) {
-        const localResults = getAllUserResultsFromLocal();
-        const combinedResults = [...response.data.data];
-
-        localResults.forEach((localResult) => {
-          const exists = combinedResults.some(
-            (r) => r.id === localResult.id || r.quiz_id === localResult.quiz_id,
-          );
-          if (!exists) combinedResults.push(localResult);
-        });
-
-        return { ...response.data, data: combinedResults };
+      if (response.data.success) {
+        return response.data;
       }
 
-      return response.data;
+      const localResults = getQuizResultsFromLocal(targetUserId);
+      return {
+        success: true,
+        message: "Data dari localStorage",
+        data: localResults,
+      };
     } catch (error) {
-      const localResults = getAllUserResultsFromLocal();
+      const targetUserId = userId || getUserId();
+      const localResults = getQuizResultsFromLocal(targetUserId);
       return {
         success: true,
         message: "Data dari localStorage",
@@ -334,12 +372,29 @@ export const quiz = {
     }
   },
 
-  getQuizResults: async (quizId) => {
+  getUserStats: async () => {
     try {
-      const response = await api.get(`/quizzes/results/quiz/${quizId}`);
-      return response.data;
+      const userId = getUserId();
+      if (!userId) {
+        return {
+          success: false,
+          message: "User tidak login",
+          data: null,
+        };
+      }
+
+      const response = await api.get(`/quizzes/results/user/${userId}/stats`);
+
+      if (response.data.success) {
+        return response.data;
+      }
+
+      const localResults = getQuizResultsFromLocal(userId);
+      return calculateStatsFromLocal(localResults);
     } catch (error) {
-      return handleApiError(error, "Gagal mengambil hasil kuis");
+      const userId = getUserId();
+      const localResults = getQuizResultsFromLocal(userId);
+      return calculateStatsFromLocal(localResults);
     }
   },
 
@@ -355,14 +410,18 @@ export const quiz = {
       }
 
       const response = await api.get(
-        `/quizzes/results/quiz/${quizId}/user/${userId}`,
+        `/quizzes/results/quiz/${quizId}/user-result?user_id=${userId}`,
       );
 
       if (response.data.success) {
         return response.data;
       }
 
-      const localResult = getQuizResultFromLocal(quizId);
+      const localResults = getQuizResultsFromLocal(userId);
+      const localResult = localResults.find(
+        (r) => r.quiz_id === Number(quizId),
+      );
+
       if (localResult) {
         return {
           success: true,
@@ -377,7 +436,12 @@ export const quiz = {
         data: null,
       };
     } catch (error) {
-      const localResult = getQuizResultFromLocal(quizId);
+      const userId = getUserId();
+      const localResults = getQuizResultsFromLocal(userId);
+      const localResult = localResults.find(
+        (r) => r.quiz_id === Number(quizId),
+      );
+
       if (localResult) {
         return {
           success: true,
@@ -394,28 +458,21 @@ export const quiz = {
     }
   },
 
-  getUserStats: async () => {
+  getQuizResults: async (quizId) => {
     try {
-      const userId = getUserId();
-      if (!userId) {
-        return {
-          success: false,
-          message: "User tidak login",
-          data: null,
-        };
-      }
-
-      const response = await api.get(`/quizzes/results/quiz/${userId}/stats`);
-
-      if (response.data.success) {
-        return response.data;
-      }
-
-      const localResults = getAllUserResultsFromLocal();
-      return calculateUserStats(localResults);
+      const response = await api.get(`/quizzes/results/quiz/${quizId}`);
+      return response.data;
     } catch (error) {
-      const localResults = getAllUserResultsFromLocal();
-      return calculateUserStats(localResults);
+      return handleApiError(error, "Gagal mengambil hasil kuis");
+    }
+  },
+
+  getPopularQuizzes: async (limit = 10) => {
+    try {
+      const response = await api.get(`/quizzes/popular?limit=${limit}`);
+      return response.data;
+    } catch (error) {
+      return handleApiError(error, "Gagal mengambil kuis populer");
     }
   },
 
@@ -430,16 +487,16 @@ export const quiz = {
     }
   },
 
-  getPopularQuizzes: async (limit = 10) => {
+  getQuizLeaderboard: async (quizId) => {
     try {
-      const response = await api.get(`/quizzes/popular?limit=${limit}`);
+      const response = await api.get(`/quizzes/${quizId}/leaderboard`);
       return response.data;
     } catch (error) {
-      return handleApiError(error, "Gagal mengambil kuis populer");
+      return handleApiError(error, "Gagal mengambil leaderboard");
     }
   },
 
-  getQuizLeaderboard: async (quizId, limit = 10) => {
+  getResultsLeaderboard: async (quizId, limit = 10) => {
     try {
       const response = await api.get(
         `/quizzes/results/leaderboard/${quizId}?limit=${limit}`,
@@ -447,35 +504,6 @@ export const quiz = {
       return response.data;
     } catch (error) {
       return handleApiError(error, "Gagal mengambil leaderboard");
-    }
-  },
-
-  saveQuizProgress: async (quizId, progressData) => {
-    try {
-      const userId = getUserId();
-      if (!userId) return { success: false, message: "User tidak login" };
-
-      const response = await api.post(`/quizzes/${quizId}/progress`, {
-        user_id: userId,
-        progress_data: JSON.stringify(progressData),
-      });
-      return response.data;
-    } catch (error) {
-      return handleApiError(error, "Gagal menyimpan progress");
-    }
-  },
-
-  getQuizProgress: async (quizId) => {
-    try {
-      const userId = getUserId();
-      if (!userId) return { success: false, message: "User tidak login" };
-
-      const response = await api.get(
-        `/quizzes/${quizId}/progress?user_id=${userId}`,
-      );
-      return response.data;
-    } catch (error) {
-      return handleApiError(error, "Gagal mengambil progress");
     }
   },
 };

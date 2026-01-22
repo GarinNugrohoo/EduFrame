@@ -6,23 +6,29 @@ const resultsController = {
     try {
       const resultData = req.body;
 
+      console.log("📥 Received submit request:", resultData);
       if (
         !resultData.quiz_id ||
-        !resultData.score ||
+        resultData.score === undefined ||
         !resultData.answers_data
       ) {
+        console.error("❌ Validation failed:", {
+          quiz_id: resultData.quiz_id,
+          score: resultData.score,
+          score_type: typeof resultData.score,
+          answers_data: resultData.answers_data,
+        });
+
         return res.status(400).json({
           success: false,
           message: "Quiz ID, skor, dan data jawaban harus diisi",
         });
       }
 
-      // User ID bisa dari body atau anonymous
       if (!resultData.user_id) {
         resultData.user_id = "anonymous";
       }
 
-      // Check if quiz exists
       const quizCheck = await Quiz.getById(resultData.quiz_id);
       if (!quizCheck.success) {
         return res.status(404).json(quizCheck);

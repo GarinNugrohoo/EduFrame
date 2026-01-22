@@ -78,12 +78,16 @@ const QuizResultPage = () => {
       : 0;
 
   const formatTime = (seconds) => {
-    if (!seconds) return "0 detik";
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    if (mins === 0) return `${secs} detik`;
-    if (secs === 0) return `${mins} menit`;
-    return `${mins}m ${secs}s`;
+    const secs = Number(seconds);
+
+    if (isNaN(secs) || secs <= 0) return "0 detik";
+
+    const mins = Math.floor(secs / 60);
+    const remainingSecs = Math.floor(secs % 60);
+
+    if (mins === 0) return `${remainingSecs} detik`;
+    if (remainingSecs === 0) return `${mins} menit`;
+    return `${mins}m ${remainingSecs}s`;
   };
 
   const getScoreColor = (score) => {
@@ -99,11 +103,11 @@ const QuizResultPage = () => {
   };
 
   const getScoreMessage = (score) => {
-    if (score >= 90) return "Luar Biasa! 🏆";
-    if (score >= 80) return "Bagus Sekali! 👍";
-    if (score >= 70) return "Baik! 😊";
-    if (score >= 60) return "Cukup Baik! 🙂";
-    return "Perlu Belajar Lagi 💪";
+    if (score >= 90) return "Luar Biasa!";
+    if (score >= 80) return "Bagus Sekali!";
+    if (score >= 70) return "Baik!";
+    if (score >= 60) return "Cukup Baik!";
+    return "AWOKAOWK KOCAK LU";
   };
 
   const getScoreDescription = (score) => {

@@ -14,6 +14,7 @@ import { ConfirmModal } from "../components/sections/ConfirmModal";
 import { ProfileSection } from "../components/sections/ProfileSection";
 import { DangerButton } from "../components/sections/DangerButton";
 import { formatProfileDate } from "../utils/dateFormatter";
+import auth from "../api/auth";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -79,7 +80,6 @@ const Profile = () => {
           navigate("/onboarding/login");
         }
       } catch (error) {
-        console.error("Error loading user data:", error);
         navigate("/onboarding/login");
       }
     };
@@ -177,22 +177,20 @@ const Profile = () => {
     setEditMode(null);
   }, [userData]);
 
-  const handleLogout = useCallback(() => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    window.dispatchEvent(new Event("authChange"));
-    navigate("/onboarding/welcome", { replace: true });
+  const handleLogout = useCallback(async () => {
+    try {
+      await auth.logout();
+    } catch (error) {
+      auth.logoutImmediately();
+    }
     setModal({ show: false, type: "" });
-  }, [navigate]);
+  }, []);
 
   const handleDeleteAccount = useCallback(() => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    window.dispatchEvent(new Event("authChange"));
+    auth.logoutImmediately();
     alert("Akun berhasil dihapus");
-    navigate("/onboarding/welcome", { replace: true });
     setModal({ show: false, type: "" });
-  }, [navigate]);
+  }, []);
 
   const togglePassword = useCallback((field) => {
     setShowPassword((prev) => ({ ...prev, [field]: !prev[field] }));
@@ -394,13 +392,13 @@ const Profile = () => {
               onClick={() => setModal({ show: true, type: "logout" })}
               variant="danger"
             />
-            <DangerButton
+            {/* <DangerButton
               icon={TrashIcon}
               title="Hapus Akun"
               subtitle="Tindakan ini tidak dapat dibatalkan"
               onClick={() => setModal({ show: true, type: "delete" })}
               variant="neutral"
-            />
+            /> */}
           </div>
         </div>
       </div>

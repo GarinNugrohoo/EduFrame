@@ -14,6 +14,11 @@ const createApiClient = (options = {}) => {
   });
 };
 
+const clearAllLocalStorage = () => {
+  localStorage.clear();
+  sessionStorage.clear();
+};
+
 const auth = {
   register: async (userData) => {
     try {
@@ -120,9 +125,14 @@ const auth = {
       await apiClient.post("/auth/logout");
     } catch (error) {
     } finally {
-      localStorage.removeItem("user");
+      clearAllLocalStorage();
       window.location.href = "/onboarding";
     }
+  },
+
+  logoutImmediately: () => {
+    clearAllLocalStorage();
+    window.location.href = "/onboarding";
   },
 
   getCurrentUser: () => {

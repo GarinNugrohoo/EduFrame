@@ -1,4 +1,3 @@
-// src/components/icons/IkonWrapper.js
 import {
   FaHome,
   FaSearch,
@@ -42,9 +41,9 @@ import {
   FaCheckCircle,
   FaClock,
   FaExternalLinkAlt,
-  FaVideo,
-  FaXbox,
   FaFileAlt,
+  FaXmark,
+  FaVideo,
   FaPlayCircle,
   FaTrophy,
   FaChevronCircleDown,
@@ -52,9 +51,8 @@ import {
   FaStar,
 } from "react-icons/fa";
 
-import { FaXmark, FaBoltLightning, FaArrowTrendUp } from "react-icons/fa6";
+import { FaBoltLightning, FaArrowTrendUp } from "react-icons/fa6";
 
-// Icon Wrappers untuk aplikasi edukasi
 export const GameIcon = (props) => <FaGamepad {...props} />;
 export const HomeIcon = (props) => <FaHome {...props} />;
 export const SearchIcon = (props) => <FaSearch {...props} />;
@@ -75,7 +73,7 @@ export const ArrowRightIcon = (props) => <FaArrowRight {...props} />;
 export const ArrowLeftIcon = (props) => <FaArrowLeft {...props} />;
 export const ChevronRightIcon = (props) => <FaChevronRight {...props} />;
 export const ChevronLeftIcon = (props) => <FaChevronLeft {...props} />;
-export const GamepadIcon = (props) => <FaGamepad {...props} />; // Alias untuk GameIcon
+export const GamepadIcon = (props) => <FaGamepad {...props} />;
 export const EnvelopeIcon = (props) => <FaEnvelope {...props} />;
 export const LockIcon = (props) => <FaLock {...props} />;
 export const SignOutAltIcon = (props) => <FaSignOutAlt {...props} />;
@@ -127,7 +125,6 @@ export const RefreshIcon = ({ className, ...props }) => (
   </svg>
 );
 
-// Ikon untuk quiz play page
 export const FlagIcon = ({ className, ...props }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24" {...props}>
     <path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z" />
@@ -139,106 +136,3 @@ export const HelpCircleIcon = ({ className, ...props }) => (
     <path d="M15.07 11.25l-.9.92C13.45 12.89 13 13.5 13 15h-2v-.5c0-1.11.45-2.11 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25zM13 19h-2v-2h2v2zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
   </svg>
 );
-
-// Optional: Export juga FaIcons langsung jika ada yang perlu akses langsung
-export {
-  FaHome,
-  FaSearch,
-  FaBell,
-  FaUser,
-  FaPlus,
-  FaBars,
-  FaTimes,
-  FaComment,
-  FaHeart,
-  FaBook,
-  FaGraduationCap,
-  FaChalkboardTeacher,
-  FaUsers,
-  FaCertificate,
-  FaCalendarAlt,
-  FaArrowRight,
-  FaArrowLeft,
-  FaChevronRight,
-  FaChevronLeft,
-  FaGamepad,
-  FaEnvelope,
-  FaLock,
-  FaSignOutAlt,
-  FaTrash,
-  FaCheck,
-  FaKey,
-  FaCog,
-  FaUserEdit,
-  FaEye,
-  FaEyeSlash,
-  FaGoogle,
-  FaFacebook,
-  FaApple,
-  FaBookOpen,
-  FaBriefcase,
-  FaLightbulb,
-  FaChartBar,
-  FaUserShield,
-  FaHistory,
-  FaCheckCircle,
-  FaClock,
-  FaExternalLinkAlt,
-  FaFileAlt,
-  FaXmark,
-  FaVideo,
-  FaPlayCircle,
-};
-
-// Optional: Default export untuk kemudahan import
-const IkonWrapper = {
-  GameIcon,
-  HomeIcon,
-  SearchIcon,
-  BellIcon,
-  UserIcon,
-  PlusIcon,
-  MenuIcon,
-  CloseIcon,
-  ChatIcon,
-  HeartIcon,
-  BookIcon,
-  GraduationIcon,
-  TeacherIcon,
-  UsersIcon,
-  CertificateIcon,
-  CalendarIcon,
-  ArrowRightIcon,
-  ArrowLeftIcon,
-  ChevronRightIcon,
-  ChevronLeftIcon,
-  GamepadIcon,
-  EnvelopeIcon,
-  LockIcon,
-  SignOutAltIcon,
-  TrashIcon,
-  CheckIcon,
-  KeyIcon,
-  CogIcon,
-  UserEditIcon,
-  EyeIcon,
-  EyeSlashIcon,
-  GoogleIcon,
-  FacebookIcon,
-  AppleIcon,
-  BookOpenIcon,
-  LightBulbIcon,
-  BriefcaseIcon,
-  ChartBarIcon,
-  ShieldCheckIcon,
-  HistoryIcon,
-  CheckCircleIcon,
-  ClockIcon,
-  ExternalLinkIcon,
-  VideoIcon,
-  XIcon,
-  FileTextIcon,
-  PlayCircleIcon,
-};
-
-export default IkonWrapper;

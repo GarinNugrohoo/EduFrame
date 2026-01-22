@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useState, useEffect } from "react";
 import OnboardingAuth from "./pages/OnboardingAuth";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
@@ -9,35 +8,9 @@ import RoadMap from "./pages/RoadMap";
 import QuizPage from "./pages/QuizPage";
 import QuizPlayPage from "./components/quiz/QuizPlayPage";
 import QuizResultPage from "./components/quiz/QuizResultPage";
-import QuizHistoryPage from "./pages/QuizHistoryPage";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const checkAuth = () => {
-      const user = localStorage.getItem("user");
-      setIsAuthenticated(!!user);
-    };
-
-    checkAuth();
-
-    const handleStorageChange = (e) => {
-      if (e.key === "user") {
-        checkAuth();
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-
-    const handleAuthChange = () => checkAuth();
-    window.addEventListener("authChange", handleAuthChange);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-      window.removeEventListener("authChange", handleAuthChange);
-    };
-  }, []);
+  const isAuthenticated = !!localStorage.getItem("user");
 
   return (
     <BrowserRouter>
@@ -96,12 +69,17 @@ function App() {
           />
 
           <Route
-            path="/history"
+            path="/panduan"
             element={
               isAuthenticated ? (
                 <>
                   <Navbar />
-                  <QuizHistoryPage />
+                  <div className="p-4">
+                    <h1 className="text-xl font-bold mb-4">Panduan</h1>
+                    <p className="text-gray-600">
+                      Halaman panduan akan segera tersedia.
+                    </p>
+                  </div>
                   <BottomNavigation />
                 </>
               ) : (
@@ -125,10 +103,42 @@ function App() {
             }
           />
 
-          <Route path="/quiz/:quizId/play" element={<QuizPlayPage />} />
-          <Route path="/quiz/:quizId/result" element={<QuizResultPage />} />
+          <Route
+            path="/quiz/:quizId/play"
+            element={
+              isAuthenticated ? (
+                <QuizPlayPage />
+              ) : (
+                <Navigate to="/onboarding" replace />
+              )
+            }
+          />
 
-          <Route path="/roadmap/:subjectId" element={<RoadMap />} />
+          <Route
+            path="/quiz/:quizId/result"
+            element={
+              isAuthenticated ? (
+                <QuizResultPage />
+              ) : (
+                <Navigate to="/onboarding" replace />
+              )
+            }
+          />
+
+          <Route
+            path="/roadmap/:subjectId"
+            element={
+              isAuthenticated ? (
+                <>
+                  <Navbar />
+                  <RoadMap />
+                  <BottomNavigation />
+                </>
+              ) : (
+                <Navigate to="/onboarding" replace />
+              )
+            }
+          />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -12,12 +12,12 @@ function BottomNavigation() {
   const navItems = [
     { path: "/home", label: "Beranda", icon: HomeIcon },
     { path: "/quiz", label: "Quiz", icon: GameIcon },
-    { path: "/history", label: "History", icon: HistoryIcon },
+    { path: "/panduan", label: "Panduan", icon: HistoryIcon },
     { path: "/profile", label: "Profile", icon: UserIcon },
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white py-3">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-3">
       <ul className="flex justify-around">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
@@ -37,7 +37,7 @@ function BottomNavigation() {
                   }`}
                 >
                   <Icon
-                    className={isActive ? "text-red-500" : "hover:text-red-500"}
+                    className={isActive ? "text-red-500" : "text-gray-500"}
                   />
                 </div>
                 <span className="text-xs font-medium">{item.label}</span>

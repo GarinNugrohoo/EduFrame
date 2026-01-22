@@ -269,10 +269,10 @@ const PrivacyPolicy = ({ onBack }) => {
                   <p className="flex items-center gap-2">
                     <span className="font-medium">Email:</span>
                     <a
-                      href="mailto:privacy@eduframe.com"
+                      href="mailto:garinnugroho0902@gmail.com"
                       className="text-blue-600 hover:text-blue-700"
                     >
-                      privacy@eduframe.com
+                      garinnugroho0912@gmail.com
                     </a>
                   </p>
                   <p className="flex items-center gap-2">

@@ -30,14 +30,20 @@ const QuizPlayPage = () => {
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [submitMessage, setSubmitMessage] = useState("");
 
-  const calculateTimeLeft = () => {
-    if (!startTimeRef.current || !quizData) return 0;
-    const now = new Date();
-    const elapsedSeconds = Math.floor(
-      (now - new Date(startTimeRef.current)) / 1000,
-    );
-    const totalSeconds = (quizData.duration_minutes || 30) * 60;
-    return Math.max(0, totalSeconds - elapsedSeconds);
+  const getUserId = () => {
+    try {
+      const userString = localStorage.getItem("user");
+      if (!userString) return "anonymous";
+
+      const user = JSON.parse(userString);
+      const userId = user?.id || user?.user_id || user?.userId;
+
+      if (!userId) return "anonymous";
+
+      return String(userId);
+    } catch (error) {
+      return "anonymous";
+    }
   };
 
   useEffect(() => {
@@ -53,17 +59,8 @@ const QuizPlayPage = () => {
           if (progress.flaggedQuestions) {
             setFlaggedQuestions(new Set(progress.flaggedQuestions));
           }
-          if (progress.startTime && quizData) {
-            const now = new Date();
-            const startTime = new Date(progress.startTime);
-            const elapsedSeconds = Math.floor((now - startTime) / 1000);
-            const totalSeconds = (quizData.duration_minutes || 30) * 60;
-            setTimeLeft(Math.max(0, totalSeconds - elapsedSeconds));
-          }
         }
-      } catch (error) {
-        console.error("Error loading saved progress:", error);
-      }
+      } catch (error) {}
     }
   }, [quizId]);
 
@@ -76,23 +73,37 @@ const QuizPlayPage = () => {
         const progress = JSON.parse(savedProgress);
         if (progress.startTime) {
           startTimeRef.current = progress.startTime;
+          const now = new Date();
+          const startTime = new Date(progress.startTime);
+          const elapsedSeconds = Math.floor((now - startTime) / 1000);
+          const totalSeconds = (quizData.duration_minutes || 30) * 60;
+          const remaining = Math.max(0, totalSeconds - elapsedSeconds);
+          setTimeLeft(remaining);
         } else {
           startTimeRef.current = new Date().toISOString();
+          setTimeLeft((quizData.duration_minutes || 30) * 60);
           saveProgress();
         }
       } else {
         startTimeRef.current = new Date().toISOString();
+        setTimeLeft((quizData.duration_minutes || 30) * 60);
         saveProgress();
       }
     }
 
     timerRef.current = setInterval(() => {
-      const remaining = calculateTimeLeft();
+      const now = new Date();
+      const startTime = new Date(startTimeRef.current);
+      const elapsedSeconds = Math.floor((now - startTime) / 1000);
+      const totalSeconds = (quizData.duration_minutes || 30) * 60;
+      const remaining = Math.max(0, totalSeconds - elapsedSeconds);
       setTimeLeft(remaining);
+
       if (remaining <= 0) {
         clearInterval(timerRef.current);
         handleAutoSubmit();
       }
+
       if (remaining > 0 && remaining % 30 === 0) {
         saveProgress();
       }
@@ -117,7 +128,6 @@ const QuizPlayPage = () => {
             const questionType = question.question_type || "multiple_choice";
             let options = [];
 
-            // Parse options berdasarkan format database Anda
             if (question.options && Array.isArray(question.options)) {
               options = question.options;
             } else if (
@@ -127,7 +137,6 @@ const QuizPlayPage = () => {
               try {
                 options = JSON.parse(question.options);
               } catch (e) {
-                console.error("Error parsing options:", e);
                 options = ["Option 1", "Option 2", "Option 3", "Option 4"];
               }
             } else {
@@ -161,7 +170,6 @@ const QuizPlayPage = () => {
         navigate("/quiz", { state: { error: result.message } });
       }
     } catch (error) {
-      console.error("Error fetching quiz:", error);
       navigate("/quiz", { state: { error: "Gagal memuat kuis" } });
     } finally {
       setLoading(false);
@@ -184,15 +192,18 @@ const QuizPlayPage = () => {
         lastSaved: new Date().toISOString(),
       };
       localStorage.setItem(`quiz_progress_${quizId}`, JSON.stringify(progress));
-    } catch (error) {
-      console.error("Error saving progress:", error);
-    }
+    } catch (error) {}
   };
 
   const handleAnswer = (questionIndex, selectedOption) => {
     const newAnswers = { ...answers };
     newAnswers[questionIndex] = selectedOption;
     setAnswers(newAnswers);
+
+    const newShortAnswers = { ...shortAnswers };
+    newShortAnswers[questionIndex] = "";
+    setShortAnswers(newShortAnswers);
+
     setTimeout(saveProgress, 500);
   };
 
@@ -200,6 +211,11 @@ const QuizPlayPage = () => {
     const newShortAnswers = { ...shortAnswers };
     newShortAnswers[questionIndex] = value;
     setShortAnswers(newShortAnswers);
+
+    const newAnswers = { ...answers };
+    newAnswers[questionIndex] = null;
+    setAnswers(newAnswers);
+
     setTimeout(saveProgress, 500);
   };
 
@@ -262,13 +278,16 @@ const QuizPlayPage = () => {
       let earnedPoints = 0;
       const answersArray = [];
 
+      const now = new Date();
+      const startTime = new Date(startTimeRef.current);
+      const timeSpent = Math.floor((now - startTime) / 1000);
+
       questions.forEach((question, index) => {
-        let selectedAnswer;
+        let selectedAnswer = "";
         let isCorrect = false;
 
         if (question.question_type === "short_answer") {
           selectedAnswer = shortAnswers[index] || "";
-          // Untuk short answer, bandingkan case-insensitive dan trim
           const userAnswer = selectedAnswer.trim().toLowerCase();
           const correctAnswer = (question.correct_answer || "")
             .trim()
@@ -276,53 +295,49 @@ const QuizPlayPage = () => {
           isCorrect = userAnswer === correctAnswer;
         } else {
           selectedAnswer = answers[index];
-
-          // Untuk multiple_choice/true_false, bandingkan langsung dengan correct_answer
-          if (selectedAnswer) {
-            // Jika selectedAnswer adalah index (0,1,2,3), bandingkan dengan options[selectedAnswer]
-            if (typeof selectedAnswer === "number") {
-              const userOption = question.options[selectedAnswer] || "";
-              isCorrect = userOption === question.correct_answer;
-            } else {
-              // Jika selectedAnswer adalah teks langsung
-              isCorrect = selectedAnswer === question.correct_answer;
-            }
+          if (selectedAnswer !== null && selectedAnswer !== undefined) {
+            const correctAnswer = question.correct_answer || "";
+            isCorrect = selectedAnswer === correctAnswer;
+          } else {
+            selectedAnswer = "";
           }
         }
 
-        totalPoints += question.points || 1;
+        const questionPoints = question.points || 1;
+        totalPoints += questionPoints;
+
         if (isCorrect) {
           correct++;
-          earnedPoints += question.points || 1;
+          earnedPoints += questionPoints;
         }
 
-        // Simpan data jawaban tanpa circular reference
         answersArray.push({
-          question_id: question.id,
+          question_id: question.id || index + 1,
           selected_answer: selectedAnswer,
           is_correct: isCorrect,
-          points: question.points || 1,
-          question_type: question.question_type,
+          points: questionPoints,
+          question_type: question.question_type || "multiple_choice",
         });
       });
 
-      const timeSpent = (quizData.duration_minutes || 30) * 60 - timeLeft;
+      const score =
+        questions.length > 0
+          ? Math.round((correct / questions.length) * 100)
+          : 0;
 
       const result = {
-        quiz_id: parseInt(quizId),
-        score: Math.round((correct / questions.length) * 100),
-        total_questions: questions.length,
-        correct_answers: correct,
-        total_points: totalPoints,
-        earned_points: earnedPoints,
-        time_taken: timeSpent,
-        time_spent_seconds: timeSpent,
+        quiz_id: parseInt(quizId) || 0,
+        user_id: getUserId(),
+        score: score,
+        total_questions: questions.length || 0,
+        correct_answers: correct || 0,
+        total_points: totalPoints || 0,
+        earned_points: earnedPoints || 0,
+        time_taken: timeSpent || 0,
         answers_data: JSON.stringify(answersArray),
         completed_at: new Date().toISOString(),
-        is_auto_submit: isAutoSubmit,
+        is_auto_submit: isAutoSubmit || false,
       };
-
-      console.log("Submitting result:", result);
 
       const submitResult = await quizApi.submitQuizResult(result);
 
@@ -338,7 +353,6 @@ const QuizPlayPage = () => {
         alert("Gagal mengumpulkan hasil: " + submitResult.message);
       }
     } catch (error) {
-      console.error("Error submitting quiz:", error);
       alert("Terjadi kesalahan saat mengumpulkan hasil: " + error.message);
     }
   };
@@ -406,17 +420,14 @@ const QuizPlayPage = () => {
       );
     }
 
-    // Untuk multiple_choice dan true_false
     const options = question.options || [];
 
     return (
       <div className="p-3">
         <div className="space-y-2">
           {options.map((option, index) => {
-            const optionLetter = String.fromCharCode(65 + index); // A, B, C, D
-            const isSelected =
-              answers[currentQuestion] === option ||
-              answers[currentQuestion] === index;
+            const optionLetter = String.fromCharCode(65 + index);
+            const isSelected = answers[currentQuestion] === option;
 
             return (
               <button
@@ -499,8 +510,8 @@ const QuizPlayPage = () => {
   const isAllAnswered = answeredCount === totalQuestions;
 
   return (
-    <div className="min-h-screen bg-gray-50 safe-area-padding">
-      <div className="sticky top-0 z-20 bg-white border-b border-gray-200 safe-area-top">
+    <div className="min-h-screen bg-gray-50">
+      <div className="sticky top-0 z-20 bg-white border-b border-gray-200">
         <div className="px-4 py-3">
           <div className="flex items-center justify-between mb-3">
             <button
@@ -598,7 +609,7 @@ const QuizPlayPage = () => {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg safe-area-bottom">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
         <div className="flex flex-col">
           <div className="flex items-center justify-between px-4 py-3">
             <button
@@ -647,7 +658,7 @@ const QuizPlayPage = () => {
 
       {showQuestionNavigator && (
         <div className="fixed inset-0 bg-black/60 z-40 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white rounded-t-2xl sm:rounded-xl w-full max-w-md max-h-[80vh] flex flex-col animate-slide-up">
+          <div className="bg-white rounded-t-2xl sm:rounded-xl w-full max-w-md max-h-[80vh] flex flex-col">
             <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -745,7 +756,7 @@ const QuizPlayPage = () => {
 
       {showExitModal && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl w-full max-w-sm animate-scale-in">
+          <div className="bg-white rounded-xl w-full max-w-sm">
             <div className="p-6">
               <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <XIcon className="w-7 h-7 text-red-600" />
@@ -778,7 +789,7 @@ const QuizPlayPage = () => {
 
       {showSubmitModal && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl w-full max-w-sm animate-scale-in">
+          <div className="bg-white rounded-xl w-full max-w-sm">
             <div className="p-6">
               <div
                 className={`w-14 h-14 ${isAllAnswered ? "bg-green-100" : "bg-yellow-100"} rounded-full flex items-center justify-center mx-auto mb-4`}

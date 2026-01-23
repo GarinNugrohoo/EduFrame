@@ -1,6 +1,5 @@
 const FloatingElements = () => (
   <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
-    {/* Floating Shapes */}
     <div className="absolute top-20 left-10 animate-float">
       <div className="w-12 h-16 bg-red-300/30 rounded-lg transform rotate-12"></div>
     </div>
@@ -17,7 +16,6 @@ const FloatingElements = () => (
       <div className="w-16 h-8 bg-red-400/20 rounded-lg"></div>
     </div>
 
-    {/* Animated Wave */}
     <div className="absolute bottom-0 left-0 w-full opacity-10">
       <svg
         className="w-full h-32"

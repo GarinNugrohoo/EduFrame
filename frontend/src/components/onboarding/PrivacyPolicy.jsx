@@ -25,7 +25,6 @@ const PrivacyPolicy = ({ onBack }) => {
           </div>
         </div>
 
-        {/* Content */}
         <div className="bg-white rounded-2xl md:rounded-3xl shadow-lg p-6 md:p-8 lg:p-10">
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-6 text-center">
             Kebijakan Privasi
@@ -41,7 +40,6 @@ const PrivacyPolicy = ({ onBack }) => {
           </div>
 
           <div className="space-y-8 text-gray-700 leading-relaxed">
-            {/* Introduction */}
             <section>
               <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
                 1. Pengantar
@@ -54,7 +52,6 @@ const PrivacyPolicy = ({ onBack }) => {
               </p>
             </section>
 
-            {/* Data Collection */}
             <section>
               <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
                 2. Data yang Kami Kumpulkan
@@ -88,7 +85,6 @@ const PrivacyPolicy = ({ onBack }) => {
               </div>
             </section>
 
-            {/* Data Usage */}
             <section>
               <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
                 3. Penggunaan Data
@@ -120,7 +116,6 @@ const PrivacyPolicy = ({ onBack }) => {
               </ul>
             </section>
 
-            {/* Data Protection */}
             <section>
               <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
                 4. Perlindungan Data
@@ -142,7 +137,6 @@ const PrivacyPolicy = ({ onBack }) => {
               </div>
             </section>
 
-            {/* Data Sharing */}
             <section>
               <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
                 5. Berbagi Data
@@ -161,7 +155,6 @@ const PrivacyPolicy = ({ onBack }) => {
               </ul>
             </section>
 
-            {/* Your Rights */}
             <section>
               <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
                 6. Hak Anda
@@ -203,7 +196,6 @@ const PrivacyPolicy = ({ onBack }) => {
               </div>
             </section>
 
-            {/* Cookies */}
             <section>
               <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
                 7. Cookies dan Teknologi Pelacakan
@@ -222,7 +214,6 @@ const PrivacyPolicy = ({ onBack }) => {
               </div>
             </section>
 
-            {/* Children's Privacy */}
             <section>
               <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
                 8. Privasi Anak
@@ -238,7 +229,6 @@ const PrivacyPolicy = ({ onBack }) => {
               </div>
             </section>
 
-            {/* Changes to Policy */}
             <section>
               <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
                 9. Perubahan Kebijakan Privasi
@@ -251,7 +241,6 @@ const PrivacyPolicy = ({ onBack }) => {
               </p>
             </section>
 
-            {/* Contact */}
             <section className="bg-blue-50 rounded-xl p-6 md:p-8 mt-8">
               <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
                 Kontak dan Dukungan Privasi
@@ -284,7 +273,6 @@ const PrivacyPolicy = ({ onBack }) => {
             </section>
           </div>
 
-          {/* Compliance */}
           <div className="mt-10 pt-8 border-t border-gray-200">
             <div className="bg-blue-50 rounded-xl p-6">
               <div className="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -317,7 +305,6 @@ const PrivacyPolicy = ({ onBack }) => {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="mt-8 text-center text-gray-500 text-sm">
           <p>
             © {new Date().getFullYear()} EduFrame Learning Platform. Kami peduli

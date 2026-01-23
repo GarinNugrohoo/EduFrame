@@ -62,8 +62,6 @@ const LoginScreen = ({
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-4 md:p-6 relative overflow-hidden">
       <FloatingElements />
-
-      {/* Back Button - Mobile Adjusted */}
       <button
         onClick={onBack}
         className="absolute top-4 md:top-6 left-4 md:left-6 z-20 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-all duration-200 group"
@@ -75,9 +73,7 @@ const LoginScreen = ({
       </button>
 
       <div className="w-full max-w-md md:max-w-lg lg:max-w-md relative z-10">
-        {/* Card Container */}
         <div className="bg-white rounded-2xl md:rounded-3xl shadow-xl md:shadow-2xl border border-gray-200/50 p-6 md:p-8 lg:p-10">
-          {/* Header */}
           <div className="text-center mb-8 md:mb-10">
             <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-red-100 to-rose-200 rounded-2xl md:rounded-3xl shadow-md md:shadow-lg mb-4 md:mb-6">
               <img src={logo} className="w-8 h-8 md:w-10 md:h-10 text-white" />
@@ -90,7 +86,6 @@ const LoginScreen = ({
             </p>
           </div>
 
-          {/* Success Message */}
           {showSuccess && localSuccessMessage && (
             <div className="mb-6 animate-fade-in">
               <div className="bg-green-50 border border-green-200 rounded-xl p-4">
@@ -111,7 +106,6 @@ const LoginScreen = ({
             </div>
           )}
 
-          {/* API Error Message */}
           {apiError && (
             <div className="mb-6 animate-fade-in">
               <div className="bg-red-50 border border-red-200 rounded-xl p-4">
@@ -125,9 +119,7 @@ const LoginScreen = ({
             </div>
           )}
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6">
-            {/* Email Field */}
             <div>
               <label className="block text-sm md:text-base font-medium text-gray-700 mb-2">
                 Email
@@ -155,7 +147,6 @@ const LoginScreen = ({
               </div>
             </div>
 
-            {/* Password Field */}
             <div>
               <label className="block text-sm md:text-base font-medium text-gray-700 mb-2">
                 Password
@@ -199,8 +190,7 @@ const LoginScreen = ({
               </div>
             </div>
 
-            {/* Remember & Forgot */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            {/* <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <label className="flex items-center gap-3 cursor-pointer">
                 <div className="relative">
                   <input
@@ -233,9 +223,8 @@ const LoginScreen = ({
               >
                 Lupa password?
               </button>
-            </div>
+            </div> */}
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={isSubmitting}
@@ -259,7 +248,6 @@ const LoginScreen = ({
             </button>
           </form>
 
-          {/* Sign Up Link */}
           <div className="mt-6 md:mt-8 pt-6 border-t border-gray-200">
             <p className="text-center text-gray-600 text-sm md:text-base">
               Belum punya akun?{" "}
@@ -274,7 +262,6 @@ const LoginScreen = ({
           </div>
         </div>
 
-        {/* Additional Info - Desktop Only */}
         <div className="hidden md:block mt-6 text-center">
           <p className="text-xs text-gray-500">
             Dengan masuk, Anda menyetujui Syarat & Ketentuan kami

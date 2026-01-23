@@ -50,11 +50,8 @@ const WelcomeScreen = ({ onLogin, onRegister }) => {
       <FloatingElements />
 
       <div className="max-w-4xl w-full relative z-10">
-        {/* Main Content Container */}
         <div className="flex flex-col lg:flex-row items-center justify-between gap-8 md:gap-12">
-          {/* Left Column - Hero Content */}
           <div className="lg:w-1/2 text-center lg:text-left">
-            {/* Logo/Icon */}
             <div className="mb-6 md:mb-8 md:mt-5 mt-15">
               <div className="inline-flex items-center justify-center w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-red-100 to-rose-200 rounded-2xl md:rounded-3xl shadow-lg">
                 <img
@@ -64,7 +61,6 @@ const WelcomeScreen = ({ onLogin, onRegister }) => {
               </div>
             </div>
 
-            {/* Title & Description */}
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 md:mb-6 leading-tight">
               EduFrame
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-rose-700">
@@ -78,7 +74,6 @@ const WelcomeScreen = ({ onLogin, onRegister }) => {
               menyenangkan.
             </p>
 
-            {/* CTA Buttons */}
             <div className="space-y-3 md:space-y-4 max-w-sm md:max-w-md lg:max-w-none">
               <button
                 onClick={onLogin}
@@ -97,7 +92,6 @@ const WelcomeScreen = ({ onLogin, onRegister }) => {
             </div>
           </div>
 
-          {/* Right Column - Features Grid */}
           <div className="lg:w-1/1">
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-xl border border-gray-100">
               <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-6 md:mb-8 text-center lg:text-left">
@@ -129,7 +123,6 @@ const WelcomeScreen = ({ onLogin, onRegister }) => {
                 ))}
               </div>
 
-              {/* Stats */}
               {/* <div className="mt-8 pt-6 border-t border-gray-200">
                 <div className="grid grid-cols-3 gap-4">
                   <div className="text-center">
@@ -162,7 +155,6 @@ const WelcomeScreen = ({ onLogin, onRegister }) => {
           </div>
         </div>
 
-        {/* Bottom Info */}
         {/* <div className="mt-8 md:mt-12 pt-6 border-t border-gray-200 text-center">
           <p className="text-gray-500 text-sm">
             Bergabung dengan{" "}

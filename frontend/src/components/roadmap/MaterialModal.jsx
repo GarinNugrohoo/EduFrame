@@ -123,9 +123,7 @@ const MaterialModal = ({
       try {
         const existing = JSON.parse(existingProgress);
         progressData.time_spent_minutes = existing.time_spent_minutes || 0;
-      } catch (e) {
-        // Silent error
-      }
+      } catch (e) {}
     }
 
     if (newStatus === "completed") {

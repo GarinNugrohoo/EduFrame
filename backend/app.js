@@ -9,7 +9,7 @@ app.use(router);
 app.use(cors());
 
 app.get("/", (req, res) => {
-  res.send("KONTOL");
+  res.send("API GARIN");
 });
 
 const PORT = 3000;

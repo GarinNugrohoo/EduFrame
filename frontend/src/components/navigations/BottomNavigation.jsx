@@ -12,7 +12,7 @@ function BottomNavigation() {
   const navItems = [
     { path: "/home", label: "Beranda", icon: HomeIcon },
     { path: "/quiz", label: "Quiz", icon: GameIcon },
-    { path: "/panduan", label: "Panduan", icon: HistoryIcon },
+    { path: "/History", label: "History", icon: HistoryIcon },
     { path: "/profile", label: "Profile", icon: UserIcon },
   ];
 

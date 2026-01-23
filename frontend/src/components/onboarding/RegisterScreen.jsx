@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from "react";
-import logo from "../../assets/EduFrame.png";
 import PropTypes from "prop-types";
 import {
   ArrowLeftIcon,

@@ -42,16 +42,17 @@ import {
   FaClock,
   FaExternalLinkAlt,
   FaFileAlt,
-  FaXmark,
   FaVideo,
   FaPlayCircle,
   FaTrophy,
   FaChevronCircleDown,
   FaChevronCircleUp,
   FaStar,
+  FaExclamationTriangle,
+  FaPrint,
 } from "react-icons/fa";
 
-import { FaBoltLightning, FaArrowTrendUp } from "react-icons/fa6";
+import { FaXmark, FaBoltLightning, FaArrowTrendUp } from "react-icons/fa6";
 
 export const GameIcon = (props) => <FaGamepad {...props} />;
 export const HomeIcon = (props) => <FaHome {...props} />;
@@ -106,6 +107,10 @@ export const ChevronUpIcon = (props) => <FaChevronCircleUp {...props} />;
 export const StarIcon = (props) => <FaStar {...props} />;
 export const LightningIcon = (props) => <FaBoltLightning {...props} />;
 export const TrendingUpIcon = (props) => <FaArrowTrendUp {...props} />;
+export const ExclamationTriangleIcon = (props) => (
+  <FaExclamationTriangle {...props} />
+);
+export const PrintIcon = (props) => <FaPrint {...props} />;
 
 export const FilterIcon = ({ className, ...props }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24" {...props}>

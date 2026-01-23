@@ -47,7 +47,6 @@ class Quiz {
         };
       }
 
-      // Get total questions count
       const countQuery = `SELECT COUNT(*) as total_questions FROM questions WHERE quiz_id = ?`;
       const [countResult] = await db.query(countQuery, [id]);
 
@@ -83,7 +82,6 @@ class Quiz {
         };
       }
 
-      // Get questions count for each quiz
       for (let quiz of data) {
         const countQuery = `SELECT COUNT(*) as total_questions FROM questions WHERE quiz_id = ?`;
         const [countResult] = await db.query(countQuery, [quiz.id]);
@@ -113,7 +111,6 @@ class Quiz {
         is_active = true,
       } = quizData;
 
-      // Check if subject exists
       const checkSubjectQuery = "SELECT id FROM subjects WHERE id = ?";
       const [subjectCheck] = await db.query(checkSubjectQuery, [subject_id]);
 
@@ -167,7 +164,6 @@ class Quiz {
         is_active,
       } = quizData;
 
-      // Check if quiz exists
       const checkQuery = "SELECT id FROM quizzes WHERE id = ?";
       const [checkResult] = await db.query(checkQuery, [id]);
 
@@ -258,7 +254,6 @@ class Quiz {
 
   static async delete(id) {
     try {
-      // Check if quiz exists
       const checkQuery = "SELECT id FROM quizzes WHERE id = ?";
       const [checkResult] = await db.query(checkQuery, [id]);
 
@@ -268,11 +263,7 @@ class Quiz {
           message: "Quiz tidak ditemukan",
         };
       }
-
-      // Delete related questions first
       await db.query("DELETE FROM questions WHERE quiz_id = ?", [id]);
-
-      // Delete quiz
       const query = "DELETE FROM quizzes WHERE id = ?";
       await db.query(query, [id]);
 

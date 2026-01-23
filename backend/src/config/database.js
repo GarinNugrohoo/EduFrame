@@ -1,10 +1,3 @@
-/*
-(KREDIT JANGAN DIHAPUS!!!)
-EDU-FRAME WEB APP
-VERSION : 1.0
-DEV BY : GARIN NUGROHO
-*/
-
 require("dotenv").config();
 const mysql = require("mysql2/promise");
 

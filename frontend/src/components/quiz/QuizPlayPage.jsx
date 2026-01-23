@@ -16,7 +16,6 @@ const QuizPlayPage = () => {
   const navigate = useNavigate();
   const startTimeRef = useRef(null);
   const timerRef = useRef(null);
-
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
   const [shortAnswers, setShortAnswers] = useState({});

@@ -8,7 +8,6 @@ import {
   EyeIcon,
   EyeSlashIcon,
   SignOutAltIcon,
-  TrashIcon,
 } from "../components/icons/IkonWrapper";
 import { ConfirmModal } from "../components/sections/ConfirmModal";
 import { ProfileSection } from "../components/sections/ProfileSection";

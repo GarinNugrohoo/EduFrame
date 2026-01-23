@@ -32,7 +32,6 @@ const UserStats = ({ userStats, totalTimeSpent }) => {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        {/* Total Waktu */}
         <div className="bg-blue-50 p-3 rounded-lg">
           <div className="flex items-center gap-2 mb-1">
             <ClockIcon className="w-4 h-4 text-red-600" />
@@ -51,7 +50,6 @@ const UserStats = ({ userStats, totalTimeSpent }) => {
           )}
         </div>
 
-        {/* Terakhir Diakses */}
         <div className="bg-blue-50 p-3 rounded-lg">
           <div className="flex items-center gap-2 mb-1">
             <CalendarIcon className="w-4 h-4 text-red-600" />
@@ -65,7 +63,6 @@ const UserStats = ({ userStats, totalTimeSpent }) => {
         </div>
       </div>
 
-      {/* Statistik Tambahan jika ada */}
       {(userStats.completed_count || userStats.average_score) && (
         <div className="mt-3 pt-3 border-t border-gray-100">
           <div className="grid grid-cols-2 gap-3">

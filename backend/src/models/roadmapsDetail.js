@@ -184,15 +184,8 @@ class RoadmapsDetail {
         time_spent_minutes = 0,
         notes = null,
         started_at = null,
-        full_reset = false, // Tambahkan parameter baru
+        full_reset = false,
       } = progressData;
-
-      console.log(
-        `[Backend] Update progress: user=${userId}, material=${materialId}`,
-      );
-      console.log(
-        `[Backend] Status: ${progress_status}, started_at param: ${started_at}, full_reset: ${full_reset}`,
-      );
 
       const materialCheckQuery = `
       SELECT m.id, s.roadmap_id 
@@ -212,28 +205,18 @@ class RoadmapsDetail {
       const roadmapId = materialCheck[0].roadmap_id;
       const completedAt = progress_status === "completed" ? new Date() : null;
 
-      // ============ LOGIKA STARTED_AT YANG DIPERBAIKI ============
       let finalStartedAt = started_at;
 
       if (full_reset) {
-        // RESET PENUH: selalu null
         finalStartedAt = null;
-        console.log(`[Backend] Full reset: started_at = null`);
       } else if (progress_status === "not_started") {
-        // Reset ke belum mulai: set ke null
         finalStartedAt = null;
-        console.log(`[Backend] Status not_started: started_at = null`);
       } else if (progress_status === "in_progress") {
         if (started_at === null) {
-          // Frontend kirim null: mulai baru
           finalStartedAt = new Date();
-          console.log(`[Backend] Starting material: new started_at = now`);
         } else if (started_at) {
-          // Frontend kirim nilai: pakai itu
           finalStartedAt = started_at;
-          console.log(`[Backend] Using provided started_at: ${started_at}`);
         } else {
-          // Tidak ada nilai: cek database
           const checkProgressQuery = `
           SELECT started_at FROM user_progress 
           WHERE user_id = ? AND material_id = ?
@@ -244,21 +227,12 @@ class RoadmapsDetail {
           ]);
 
           if (existing.length > 0 && existing[0].started_at) {
-            // Pakai yang ada di database
             finalStartedAt = existing[0].started_at;
-            console.log(
-              `[Backend] Using existing started_at from DB: ${finalStartedAt}`,
-            );
           } else {
-            // Buat baru
             finalStartedAt = new Date();
-            console.log(
-              `[Backend] No existing started_at, creating new: ${finalStartedAt}`,
-            );
           }
         }
       } else if (progress_status === "completed") {
-        // Untuk completed, pertahankan started_at yang ada
         const checkProgressQuery = `
         SELECT started_at FROM user_progress 
         WHERE user_id = ? AND material_id = ?
@@ -270,23 +244,12 @@ class RoadmapsDetail {
 
         if (existing.length > 0 && existing[0].started_at) {
           finalStartedAt = existing[0].started_at;
-          console.log(
-            `[Backend] Completed: keeping existing started_at: ${finalStartedAt}`,
-          );
         } else if (started_at) {
           finalStartedAt = started_at;
-          console.log(
-            `[Backend] Completed: using provided started_at: ${started_at}`,
-          );
         } else {
-          // Fallback: mulai dari sekarang minus waktu yang diberikan
           finalStartedAt = new Date(Date.now() - time_spent_minutes * 60000);
-          console.log(
-            `[Backend] Completed: estimated started_at from time_spent: ${finalStartedAt}`,
-          );
         }
       }
-      // ===========================================================
 
       const checkProgressQuery = `
       SELECT id, started_at FROM user_progress 
@@ -299,11 +262,10 @@ class RoadmapsDetail {
 
       let result;
       if (existingProgress.length > 0) {
-        // ============ PERBAIKAN QUERY UPDATE ============
         const updateQuery = `
         UPDATE user_progress 
         SET progress_status = ?, 
-            started_at = ?,  -- PAKAI finalStartedAt (bisa null!)
+            started_at = ?,  
             completed_at = ?, 
             time_spent_minutes = ?, 
             notes = ?, 
@@ -312,13 +274,12 @@ class RoadmapsDetail {
       `;
         [result] = await db.query(updateQuery, [
           progress_status,
-          finalStartedAt, // Ini bisa null untuk reset!
+          finalStartedAt,
           completedAt,
           time_spent_minutes,
           notes,
           existingProgress[0].id,
         ]);
-        // ===============================================
       } else {
         const insertQuery = `
         INSERT INTO user_progress 
@@ -338,10 +299,6 @@ class RoadmapsDetail {
 
       await this.updateUserRoadmapStats(userId, roadmapId);
 
-      console.log(
-        `[Backend] Update successful: started_at = ${finalStartedAt}`,
-      );
-
       return {
         success: true,
         message: "Progress berhasil disimpan",
@@ -352,16 +309,9 @@ class RoadmapsDetail {
           started_at: finalStartedAt,
           completed_at: completedAt,
           time_spent_minutes: time_spent_minutes,
-          note:
-            progress_status === "not_started"
-              ? "started_at reset to null"
-              : progress_status === "in_progress" && !started_at
-                ? "new started_at created"
-                : "using existing/provided started_at",
         },
       };
     } catch (error) {
-      console.error("[Backend] Error in updateUserProgress:", error);
       throw error;
     }
   }
@@ -422,7 +372,6 @@ class RoadmapsDetail {
 
       return true;
     } catch (error) {
-      console.error("Error updating roadmap stats:", error);
       return false;
     }
   }
@@ -436,16 +385,12 @@ class RoadmapsDetail {
       const [result] = await db.query(query, [userId, materialId]);
       return result.length > 0 ? result[0] : null;
     } catch (error) {
-      console.error("Error getting user material progress:", error);
       return null;
     }
   }
 
   static async completeMaterial(userId, materialId) {
     try {
-      console.log(`Completing material ${materialId} for user ${userId}`);
-
-      // 1. Dapatkan progress saat ini
       const currentProgress = await this.getUserMaterialProgress(
         userId,
         materialId,
@@ -453,83 +398,47 @@ class RoadmapsDetail {
 
       let time_spent_minutes = 0;
       let startedAt = null;
-      let calculationMethod = "unknown";
 
-      // 2. LOGIKA PERHITUNGAN YANG DIPERBAIKI
       if (currentProgress) {
         startedAt = currentProgress.started_at;
 
         if (startedAt) {
-          // Ada started_at: hitung normal
           const startTime = new Date(startedAt);
           const endTime = new Date();
           const diffMs = endTime - startTime;
           const diffMinutes = Math.floor(diffMs / 60000);
 
-          console.log(`Calculating from started_at: ${diffMinutes} minutes`);
-
           if (diffMinutes < 1) {
-            // Waktu terlalu singkat (<1 menit)
             time_spent_minutes = 1;
-            calculationMethod = "minimum_1_minute";
-            console.log(`Too short (<1 min), using 1 minute`);
           } else if (diffMinutes > 480) {
             time_spent_minutes = 480;
-            calculationMethod = "capped_8_hours";
-            console.log(`Too long (>8h), capping at 480 minutes`);
           } else {
             time_spent_minutes = diffMinutes;
-            calculationMethod = "date_difference";
-            console.log(`Using calculated time: ${time_spent_minutes} minutes`);
           }
         } else {
-          // TIDAK ADA started_at (mungkin dari reset atau langsung complete)
-          startedAt = new Date(); // Set started_at sekarang
-
-          // Cek apakah ini material yang pernah dikerjakan sebelumnya
+          startedAt = new Date();
           const existingTime = currentProgress.time_spent_minutes || 0;
 
           if (existingTime > 0 && existingTime <= 480 && existingTime !== 6) {
-            // Gunakan waktu sebelumnya jika valid
             time_spent_minutes = existingTime;
-            calculationMethod = "previous_valid_time";
-            console.log(
-              `No started_at, using previous time: ${time_spent_minutes} minutes`,
-            );
           } else {
-            // Material baru atau waktu tidak valid
             time_spent_minutes =
               await this.calculateDefaultTimeForMaterial(materialId);
-            calculationMethod = "material_duration_based";
-            console.log(
-              `New/direct completion, using default: ${time_spent_minutes} minutes`,
-            );
           }
         }
       } else {
-        // Belum ada progress sama sekali (langsung dari not_started ke completed)
         startedAt = new Date();
         time_spent_minutes =
           await this.calculateDefaultTimeForMaterial(materialId);
-        calculationMethod = "direct_completion_default";
-        console.log(
-          `First time completion, using default: ${time_spent_minutes} minutes`,
-        );
       }
 
-      console.log(
-        `Final: ${time_spent_minutes} minutes (method: ${calculationMethod})`,
-      );
-
-      // 3. Update database
       const completedAt = new Date();
 
       if (currentProgress) {
-        // Update existing
         const updateQuery = `
         UPDATE user_progress 
         SET progress_status = 'completed',
-            started_at = ?,  -- PASTIKAN startedAt diupdate (bisa baru)
+            started_at = ?,  
             completed_at = ?,
             time_spent_minutes = ?,
             updated_at = CURRENT_TIMESTAMP
@@ -537,14 +446,13 @@ class RoadmapsDetail {
       `;
 
         await db.query(updateQuery, [
-          startedAt, // Bisa null atau baru
+          startedAt,
           completedAt,
           time_spent_minutes,
           userId,
           materialId,
         ]);
       } else {
-        // Insert new
         const insertQuery = `
         INSERT INTO user_progress 
         (user_id, material_id, progress_status, started_at, completed_at, time_spent_minutes)
@@ -561,7 +469,6 @@ class RoadmapsDetail {
         ]);
       }
 
-      // 4. Update stats dan return
       const materialCheckQuery = `
       SELECT s.roadmap_id 
       FROM materials m
@@ -585,15 +492,9 @@ class RoadmapsDetail {
           started_at: startedAt,
           completed_at: completedAt,
           time_spent_minutes: time_spent_minutes,
-          calculation_method: calculationMethod,
-          note:
-            calculationMethod === "date_difference"
-              ? "Calculated from actual learning time"
-              : "Estimated time based on material",
         },
       };
     } catch (error) {
-      console.error("Error completing material:", error);
       return {
         success: false,
         message: "Gagal menyelesaikan material",
@@ -602,10 +503,8 @@ class RoadmapsDetail {
     }
   }
 
-  // Fungsi baru untuk menghitung waktu default
   static async calculateDefaultTimeForMaterial(materialId) {
     try {
-      // Cek durasi material dari database
       const query = `
       SELECT duration_minutes FROM materials WHERE id = ?
     `;
@@ -613,28 +512,19 @@ class RoadmapsDetail {
 
       if (result.length > 0 && result[0].duration_minutes) {
         const materialDuration = parseInt(result[0].duration_minutes) || 0;
-
-        // Jika material punya durasi, gunakan sebagai acuan
         if (materialDuration > 0) {
-          // Gunakan 20-50% dari durasi material sebagai default
-          const percentage = 0.3; // 30%
+          const percentage = 0.3;
           const defaultTime = Math.max(
             1,
             Math.floor(materialDuration * percentage),
-          );
-          console.log(
-            `Material duration: ${materialDuration} min, using ${defaultTime} min (${percentage * 100}%) as default`,
           );
           return defaultTime;
         }
       }
 
-      // Default fallback: 10 menit
-      console.log(`No material duration found, using fallback: 10 minutes`);
       return 10;
     } catch (error) {
-      console.error("Error calculating default time:", error);
-      return 10; // Default fallback
+      return 10;
     }
   }
 

@@ -25,9 +25,7 @@ const getUserId = () => {
       try {
         const user = JSON.parse(userString);
         userId = user.id || user.user_id || user.userId;
-      } catch (e) {
-        // Silent error
-      }
+      } catch (e) {}
     }
   }
 
@@ -50,9 +48,7 @@ const getToken = () => {
       try {
         const user = JSON.parse(userString);
         token = user.token || user.accessToken || user.access_token;
-      } catch (e) {
-        // Silent error
-      }
+      } catch (e) {}
     }
   }
 

@@ -2,13 +2,12 @@ const db = require("../config/database");
 const bcrypt = require("bcrypt");
 
 class User {
-  // Method DAFTAR
   static async register(userData) {
     try {
       const { username, email, password } = userData;
       const [dataUsername] = await db.query(
         "SELECT id FROM users WHERE username = ? LIMIT 1",
-        [username]
+        [username],
       );
 
       if (dataUsername.length > 0) {
@@ -21,7 +20,7 @@ class User {
 
       const [dataEmail] = await db.query(
         "SELECT id FROM users WHERE email = ? LIMIT 1",
-        [email]
+        [email],
       );
 
       if (dataEmail.length > 0) {
@@ -48,7 +47,6 @@ class User {
     }
   }
 
-  // Method LOGIN
   static async login(userData) {
     try {
       const { email, password } = userData;
@@ -82,7 +80,6 @@ class User {
     }
   }
 
-  // Method untuk GET user by ID
   static async getById(id) {
     try {
       const sql = `SELECT id, username, email, created_at 
@@ -106,7 +103,6 @@ class User {
     }
   }
 
-  // Method untuk GET ALL USER
   static async getAll() {
     try {
       const sql = `SELECT id, username, email, created_at FROM users`;

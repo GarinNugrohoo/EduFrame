@@ -13,7 +13,6 @@ class Result {
         answers_data,
       } = resultData;
 
-      // Check if quiz exists
       const checkQuizQuery = "SELECT id FROM quizzes WHERE id = ?";
       const [quizCheck] = await db.query(checkQuizQuery, [quiz_id]);
 
@@ -24,7 +23,6 @@ class Result {
         };
       }
 
-      // Stringify answers_data if it's an array/object
       let answersDataString = answers_data;
       if (answers_data && typeof answers_data === "object") {
         answersDataString = JSON.stringify(answers_data);
@@ -46,7 +44,6 @@ class Result {
         answersDataString,
       ]);
 
-      // Update quiz participants count
       await db.query(
         `
         UPDATE quizzes 
@@ -93,7 +90,6 @@ class Result {
         };
       }
 
-      // Parse answers_data JSON
       const results = data.map((result) => {
         if (result.answers_data && typeof result.answers_data === "string") {
           try {
@@ -176,7 +172,6 @@ class Result {
 
       let result = data[0];
 
-      // Parse answers_data JSON
       if (result.answers_data && typeof result.answers_data === "string") {
         try {
           result.answers_data = JSON.parse(result.answers_data);
@@ -222,7 +217,6 @@ class Result {
 
       let result = data[0];
 
-      // Parse answers_data JSON
       if (result.answers_data && typeof result.answers_data === "string") {
         try {
           result.answers_data = JSON.parse(result.answers_data);
@@ -248,7 +242,6 @@ class Result {
 
   static async getUserStats(user_id) {
     try {
-      // Get total results count
       const totalQuery = `
         SELECT 
           COUNT(*) as total_attempts,
@@ -269,7 +262,6 @@ class Result {
         };
       }
 
-      // Get category breakdown
       const categoryQuery = `
         SELECT 
           q.category,
@@ -358,7 +350,6 @@ class Result {
 
   static async delete(id) {
     try {
-      // Check if result exists
       const checkQuery = "SELECT id FROM quiz_results WHERE id = ?";
       const [checkResult] = await db.query(checkQuery, [id]);
 

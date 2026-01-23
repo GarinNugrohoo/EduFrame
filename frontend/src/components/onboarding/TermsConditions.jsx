@@ -25,7 +25,6 @@ const TermsConditions = ({ onBack }) => {
           </div>
         </div>
 
-        {/* Content */}
         <div className="bg-white rounded-2xl md:rounded-3xl shadow-lg p-6 md:p-8 lg:p-10">
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-6 text-center">
             Syarat dan Ketentuan Penggunaan
@@ -41,7 +40,6 @@ const TermsConditions = ({ onBack }) => {
           </div>
 
           <div className="space-y-8 text-gray-700 leading-relaxed">
-            {/* Introduction */}
             <section>
               <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
                 1. Penerimaan Syarat
@@ -54,7 +52,6 @@ const TermsConditions = ({ onBack }) => {
               </p>
             </section>
 
-            {/* Account Registration */}
             <section>
               <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
                 2. Pendaftaran Akun
@@ -89,7 +86,6 @@ const TermsConditions = ({ onBack }) => {
               </ul>
             </section>
 
-            {/* Usage Guidelines */}
             <section>
               <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
                 3. Panduan Penggunaan
@@ -109,7 +105,6 @@ const TermsConditions = ({ onBack }) => {
               </ul>
             </section>
 
-            {/* Content Ownership */}
             <section>
               <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
                 4. Hak Kekayaan Intelektual
@@ -135,8 +130,7 @@ const TermsConditions = ({ onBack }) => {
               </div>
             </section>
 
-            {/* Subscription & Payments */}
-            <section>
+            {/* <section>
               <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
                 5. Langganan dan Pembayaran
               </h2>
@@ -155,12 +149,11 @@ const TermsConditions = ({ onBack }) => {
                   dilakukan secara otomatis kecuali Anda membatalkannya.
                 </p>
               </div>
-            </section>
+            </section> */}
 
-            {/* Termination */}
             <section>
               <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
-                6. Penghentian Akun
+                5. Penghentian Akun
               </h2>
               <p className="mb-4">
                 Kami berhak untuk menghentikan atau menangguhkan akun Anda jika:
@@ -173,10 +166,9 @@ const TermsConditions = ({ onBack }) => {
               </ul>
             </section>
 
-            {/* Disclaimer */}
             <section>
               <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
-                7. Penafian
+                6. Penafian
               </h2>
               <div className="space-y-3">
                 <p>
@@ -192,10 +184,9 @@ const TermsConditions = ({ onBack }) => {
               </div>
             </section>
 
-            {/* Changes to Terms */}
             <section>
               <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
-                8. Perubahan Syarat dan Ketentuan
+                7. Perubahan Syarat dan Ketentuan
               </h2>
               <p>
                 Kami dapat memperbarui syarat dan ketentuan ini dari waktu ke
@@ -206,7 +197,6 @@ const TermsConditions = ({ onBack }) => {
               </p>
             </section>
 
-            {/* Contact */}
             <section className="bg-gray-50 rounded-xl p-6 md:p-8 mt-8">
               <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
                 Kontak
@@ -237,7 +227,6 @@ const TermsConditions = ({ onBack }) => {
             </section>
           </div>
 
-          {/* Acceptance */}
           <div className="mt-10 pt-8 border-t border-gray-200">
             <div className="bg-green-50 rounded-xl p-6 text-center">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -252,7 +241,6 @@ const TermsConditions = ({ onBack }) => {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="mt-8 text-center text-gray-500 text-sm">
           <p>
             © {new Date().getFullYear()} EduFrame Learning Platform. Semua hak

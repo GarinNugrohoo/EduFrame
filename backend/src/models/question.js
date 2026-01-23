@@ -19,7 +19,6 @@ class Question {
         };
       }
 
-      // Parse options JSON if it's stored as JSON string
       const questions = data.map((question) => {
         if (question.options && typeof question.options === "string") {
           try {
@@ -55,8 +54,6 @@ class Question {
       }
 
       let question = data[0];
-
-      // Parse options JSON
       if (question.options && typeof question.options === "string") {
         try {
           question.options = JSON.parse(question.options);
@@ -87,8 +84,6 @@ class Question {
         points = 10,
         order_index = 0,
       } = questionData;
-
-      // Check if quiz exists
       const checkQuizQuery = "SELECT id FROM quizzes WHERE id = ?";
       const [quizCheck] = await db.query(checkQuizQuery, [quiz_id]);
 
@@ -99,7 +94,6 @@ class Question {
         };
       }
 
-      // Stringify options if it's an array/object
       let optionsString = options;
       if (options && typeof options === "object") {
         optionsString = JSON.stringify(options);
@@ -148,7 +142,6 @@ class Question {
         order_index,
       } = questionData;
 
-      // Check if question exists
       const checkQuery = "SELECT id FROM questions WHERE id = ?";
       const [checkResult] = await db.query(checkQuery, [id]);
 
@@ -190,7 +183,6 @@ class Question {
       }
 
       if (options !== undefined) {
-        // Stringify options if it's an array/object
         let optionsString = options;
         if (options && typeof options === "object") {
           optionsString = JSON.stringify(options);
@@ -244,7 +236,6 @@ class Question {
 
   static async delete(id) {
     try {
-      // Check if question exists
       const checkQuery = "SELECT id FROM questions WHERE id = ?";
       const [checkResult] = await db.query(checkQuery, [id]);
 
@@ -269,7 +260,6 @@ class Question {
 
   static async createBatch(quiz_id, questions) {
     try {
-      // Check if quiz exists
       const checkQuizQuery = "SELECT id FROM quizzes WHERE id = ?";
       const [quizCheck] = await db.query(checkQuizQuery, [quiz_id]);
 
@@ -294,7 +284,6 @@ class Question {
           points = 10,
         } = questionData;
 
-        // Stringify options
         let optionsString = options;
         if (options && typeof options === "object") {
           optionsString = JSON.stringify(options);

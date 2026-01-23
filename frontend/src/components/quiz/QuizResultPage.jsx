@@ -19,30 +19,24 @@ const QuizResultPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { quizId } = useParams();
-
   const [result, setResult] = useState(null);
   const [quizData, setQuizData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Ambil data dari state navigation atau fetch dari API
   useEffect(() => {
     const fetchResultData = async () => {
       try {
         setLoading(true);
-
-        // Coba ambil dari state navigation
         const locationResult = location.state?.result;
         if (locationResult) {
           setResult(locationResult);
         } else {
-          // Jika tidak ada di state, fetch dari API
           const resultResponse = await quizApi.getUserQuizResult(quizId);
           if (resultResponse.success) {
             setResult(resultResponse.data);
           }
         }
 
-        // Fetch data quiz untuk mendapatkan title
         const quizResponse = await quizApi.getQuizById(quizId);
         if (quizResponse.success) {
           setQuizData(quizResponse.data);
@@ -57,7 +51,6 @@ const QuizResultPage = () => {
     fetchResultData();
   }, [quizId, location.state]);
 
-  // Fallback data jika result null
   const safeResult = result || {
     quiz_id: parseInt(quizId),
     score: 0,
@@ -237,12 +230,9 @@ const QuizResultPage = () => {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="flex-1 overflow-y-auto pb-32 px-4 pt-4">
-        {/* Score Summary Card */}
         <section className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mb-6">
           <div className="p-5">
-            {/* Completion Time */}
             <div className="flex justify-between items-center mb-6 p-3 bg-gray-50 rounded-lg">
               <div className="flex items-center gap-2">
                 <ClockIcon className="w-4 h-4 text-gray-600" />
@@ -254,7 +244,6 @@ const QuizResultPage = () => {
             </div>
 
             <div className="flex flex-col items-center text-center mb-6">
-              {/* Animated Score Circle */}
               <div className="relative w-40 h-40 mb-4">
                 <svg className="w-full h-full" viewBox="0 0 100 100">
                   <circle
@@ -300,7 +289,6 @@ const QuizResultPage = () => {
               </div>
             </div>
 
-            {/* Quick Stats */}
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="bg-green-50 rounded-xl p-4">
                 <div className="flex items-center justify-center gap-2 mb-2">
@@ -337,7 +325,6 @@ const QuizResultPage = () => {
               </div>
             </div>
 
-            {/* Time Stats */}
             <div className="bg-gray-50 rounded-xl p-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -371,7 +358,6 @@ const QuizResultPage = () => {
               </div>
             </div>
 
-            {/* Points Summary */}
             {safeResult.total_points > 0 && (
               <div className="mt-4 bg-yellow-50 rounded-xl p-4">
                 <div className="flex items-center justify-center gap-2 mb-2">
@@ -396,7 +382,6 @@ const QuizResultPage = () => {
           </div>
         </section>
 
-        {/* Detailed Performance Analysis */}
         <section className="bg-white rounded-2xl border border-gray-200 p-5 mb-6">
           <div className="flex items-center gap-2 mb-5">
             <ChartBarIcon className="w-6 h-6 text-gray-700" />
@@ -404,7 +389,6 @@ const QuizResultPage = () => {
           </div>
 
           <div className="space-y-6">
-            {/* Accuracy */}
             <div>
               <div className="flex justify-between items-center mb-3">
                 <div>
@@ -427,7 +411,6 @@ const QuizResultPage = () => {
               </div>
             </div>
 
-            {/* Time Efficiency */}
             {safeResult.time_taken > 0 && (
               <div>
                 <div className="flex justify-between items-center mb-3">
@@ -461,7 +444,6 @@ const QuizResultPage = () => {
               </div>
             )}
 
-            {/* Point Efficiency */}
             {safeResult.total_points > 0 && (
               <div>
                 <div className="flex justify-between items-center mb-3">
@@ -490,7 +472,6 @@ const QuizResultPage = () => {
           </div>
         </section>
 
-        {/* Improvement Suggestions */}
         <section
           className={`rounded-2xl p-5 mb-6 ${
             isPassed
@@ -567,7 +548,6 @@ const QuizResultPage = () => {
         </section>
       </main>
 
-      {/* Action Button - Fixed Bottom with Safe Space */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
         <div className="max-w-md mx-auto space-y-3">
           <button
@@ -587,8 +567,6 @@ const QuizResultPage = () => {
           </button>
         </div>
       </div>
-
-      {/* Safe space for bottom button */}
       <div className="h-32"></div>
     </div>
   );

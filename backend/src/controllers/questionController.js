@@ -22,7 +22,6 @@ const questionController = {
     }
   },
 
-  // Get question by ID
   getQuestionById: async (req, res) => {
     try {
       const { id } = req.params;
@@ -43,12 +42,9 @@ const questionController = {
     }
   },
 
-  // Create question
   createQuestion: async (req, res) => {
     try {
       const questionData = req.body;
-
-      // Validasi data
       if (!questionData.quiz_id || !questionData.question_text) {
         return res.status(400).json({
           success: false,
@@ -83,7 +79,6 @@ const questionController = {
     }
   },
 
-  // Update question
   updateQuestion: async (req, res) => {
     try {
       const { id } = req.params;
@@ -106,7 +101,6 @@ const questionController = {
     }
   },
 
-  // Delete question
   deleteQuestion: async (req, res) => {
     try {
       const { id } = req.params;
@@ -128,7 +122,6 @@ const questionController = {
     }
   },
 
-  // Create batch questions
   createBatchQuestions: async (req, res) => {
     try {
       const { quiz_id } = req.params;
@@ -141,7 +134,6 @@ const questionController = {
         });
       }
 
-      // Validasi setiap soal
       for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
 
@@ -177,7 +169,6 @@ const questionController = {
     }
   },
 
-  // Validate answer
   validateAnswer: async (req, res) => {
     try {
       const { id } = req.params;
@@ -207,7 +198,6 @@ const questionController = {
     }
   },
 
-  // Validate batch answers (for quiz submission)
   validateBatchAnswers: async (req, res) => {
     try {
       const { quiz_id } = req.params;

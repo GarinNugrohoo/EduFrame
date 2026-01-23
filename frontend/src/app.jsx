@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import OnboardingAuth from "./pages/OnboardingAuth";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
@@ -8,10 +9,63 @@ import RoadMap from "./pages/RoadMap";
 import QuizPage from "./pages/QuizPage";
 import QuizPlayPage from "./components/quiz/QuizPlayPage";
 import QuizResultPage from "./components/quiz/QuizResultPage";
+import HistoryPage from "./pages/History";
+import HistoryDetailPage from "./pages/HistoryDetailPage";
+
+const AuthHandler = ({ children, requireAuth = true }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const user = localStorage.getItem("user");
+      setIsAuthenticated(!!user);
+    };
+
+    checkAuth();
+
+    const handleStorageChange = () => {
+      checkAuth();
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    const interval = setInterval(checkAuth, 1000);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
+
+  if (isAuthenticated === null) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
+      </div>
+    );
+  }
+
+  if (requireAuth && !isAuthenticated) {
+    return <Navigate to="/onboarding" replace />;
+  }
+
+  if (!requireAuth && isAuthenticated) {
+    return <Navigate to="/home" replace />;
+  }
+
+  return children;
+};
+
+const MainLayout = ({ children }) => {
+  return (
+    <>
+      <Navbar />
+      <main className="pb-16"> {children}</main>
+      <BottomNavigation />
+    </>
+  );
+};
 
 function App() {
-  const isAuthenticated = !!localStorage.getItem("user");
-
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-gray-50">
@@ -19,128 +73,113 @@ function App() {
           <Route
             path="/"
             element={
-              isAuthenticated ? (
+              <AuthHandler requireAuth={false}>
                 <Navigate to="/home" replace />
-              ) : (
-                <Navigate to="/onboarding" replace />
-              )
+              </AuthHandler>
             }
           />
 
           <Route
             path="/onboarding/*"
             element={
-              isAuthenticated ? (
-                <Navigate to="/home" replace />
-              ) : (
+              <AuthHandler requireAuth={false}>
                 <OnboardingAuth />
-              )
+              </AuthHandler>
             }
           />
 
           <Route
             path="/home"
             element={
-              isAuthenticated ? (
-                <>
-                  <Navbar />
+              <AuthHandler>
+                <MainLayout>
                   <Home />
-                  <BottomNavigation />
-                </>
-              ) : (
-                <Navigate to="/onboarding" replace />
-              )
+                </MainLayout>
+              </AuthHandler>
             }
           />
 
           <Route
             path="/profile"
             element={
-              isAuthenticated ? (
-                <>
-                  <Navbar />
+              <AuthHandler>
+                <MainLayout>
                   <Profile />
-                  <BottomNavigation />
-                </>
-              ) : (
-                <Navigate to="/onboarding" replace />
-              )
+                </MainLayout>
+              </AuthHandler>
             }
           />
 
           <Route
-            path="/panduan"
+            path="/history"
             element={
-              isAuthenticated ? (
-                <>
-                  <Navbar />
-                  <div className="p-4">
-                    <h1 className="text-xl font-bold mb-4">Panduan</h1>
-                    <p className="text-gray-600">
-                      Halaman panduan akan segera tersedia.
-                    </p>
-                  </div>
-                  <BottomNavigation />
-                </>
-              ) : (
-                <Navigate to="/onboarding" replace />
-              )
+              <AuthHandler>
+                <MainLayout>
+                  <HistoryPage />
+                </MainLayout>
+              </AuthHandler>
+            }
+          />
+
+          <Route
+            path="/history/:id"
+            element={
+              <AuthHandler>
+                <MainLayout>
+                  <HistoryDetailPage />
+                </MainLayout>
+              </AuthHandler>
             }
           />
 
           <Route
             path="/quiz"
             element={
-              isAuthenticated ? (
-                <>
-                  <Navbar />
+              <AuthHandler>
+                <MainLayout>
                   <QuizPage />
-                  <BottomNavigation />
-                </>
-              ) : (
-                <Navigate to="/onboarding" replace />
-              )
-            }
-          />
-
-          <Route
-            path="/quiz/:quizId/play"
-            element={
-              isAuthenticated ? (
-                <QuizPlayPage />
-              ) : (
-                <Navigate to="/onboarding" replace />
-              )
-            }
-          />
-
-          <Route
-            path="/quiz/:quizId/result"
-            element={
-              isAuthenticated ? (
-                <QuizResultPage />
-              ) : (
-                <Navigate to="/onboarding" replace />
-              )
+                </MainLayout>
+              </AuthHandler>
             }
           />
 
           <Route
             path="/roadmap/:subjectId"
             element={
-              isAuthenticated ? (
-                <>
-                  <Navbar />
+              <AuthHandler>
+                <MainLayout>
                   <RoadMap />
-                  <BottomNavigation />
-                </>
-              ) : (
-                <Navigate to="/onboarding" replace />
-              )
+                </MainLayout>
+              </AuthHandler>
             }
           />
 
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route
+            path="/quiz/:quizId/play"
+            element={
+              <AuthHandler>
+                <QuizPlayPage />
+              </AuthHandler>
+            }
+          />
+
+          <Route
+            path="/quiz/:quizId/result"
+            element={
+              <AuthHandler>
+                <QuizResultPage />
+              </AuthHandler>
+            }
+          />
+
+          <Route
+            path="*"
+            element={
+              <AuthHandler requireAuth={false}>
+                <Navigate to="/home" replace />
+              </AuthHandler>
+            }
+          />
         </Routes>
       </div>
     </BrowserRouter>

@@ -6,7 +6,6 @@ const apikey = require("../middleware/apikey");
 
 router.use(apikey.validasiApi);
 
-// Public routes
 router.get("/", quizController.getAllQuizzes);
 router.get("/popular", quizController.getPopularQuizzes);
 router.get("/search", quizController.searchQuizzes);
@@ -16,7 +15,6 @@ router.get("/:id/with-questions", quizController.getQuizWithQuestions);
 router.get("/:id/leaderboard", quizController.getQuizLeaderboard);
 router.post("/:id/start", quizController.startQuiz);
 
-// Result routes
 router.post("/results/submit", resultController.submitResult);
 router.get("/results/user/:user_id", resultController.getUserResults);
 router.get("/results/quiz/:quiz_id", resultController.getQuizResults);

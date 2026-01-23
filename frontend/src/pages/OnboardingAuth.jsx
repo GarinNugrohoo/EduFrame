@@ -223,10 +223,7 @@ const OnboardingAuth = () => {
 
   return (
     <Routes>
-      {/* Default redirect to slides */}
       <Route path="/" element={<Navigate to="slides" replace />} />
-
-      {/* Onboarding slides */}
       <Route
         path="slides"
         element={
@@ -239,7 +236,6 @@ const OnboardingAuth = () => {
         }
       />
 
-      {/* Welcome screen */}
       <Route
         path="welcome"
         element={
@@ -250,7 +246,6 @@ const OnboardingAuth = () => {
         }
       />
 
-      {/* Login screen */}
       <Route
         path="login"
         element={
@@ -273,7 +268,6 @@ const OnboardingAuth = () => {
         }
       />
 
-      {/* Register screen */}
       <Route
         path="register"
         element={
@@ -295,19 +289,16 @@ const OnboardingAuth = () => {
         }
       />
 
-      {/* Terms & Conditions */}
       <Route
         path="terms"
         element={<TermsConditions onBack={() => navigate(-1)} />}
       />
 
-      {/* Privacy Policy */}
       <Route
         path="privacy"
         element={<PrivacyPolicy onBack={() => navigate(-1)} />}
       />
 
-      {/* Redirect unknown routes to slides */}
       <Route path="*" element={<Navigate to="slides" replace />} />
     </Routes>
   );

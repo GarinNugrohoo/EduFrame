@@ -42,7 +42,7 @@ const Navbar = () => {
   const navItems = [
     { path: "/home", label: "Beranda" },
     { path: "/quiz", label: "Quiz" },
-    { path: "/panduan", label: "Panduan" },
+    { path: "/History", label: "History" },
     { path: "/profile", label: "Profile" },
   ];
 

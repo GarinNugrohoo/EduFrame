@@ -1,4 +1,3 @@
-// src/hooks/useSubjectsData.js
 import { useState, useCallback, useEffect, useRef } from "react";
 import { getSubjects } from "../api/subjects";
 import { transformSubjectsData } from "../utils/subjectTransformer";

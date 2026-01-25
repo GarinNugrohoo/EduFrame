@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import logo from "../assets/EduFrameLoading.png";
 import {
   UserIcon,
   EnvelopeIcon,
@@ -197,10 +198,28 @@ const Profile = () => {
 
   if (!userData.email) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Memuat data profil...</p>
+      <div className="text-center py-12 mt-45" role="status" aria-live="polite">
+        <div className="inline-block from-red-50 to-white rounded-2xl mb-2">
+          <div className="relative">
+            <img
+              src={logo}
+              alt="EduFrame Loading"
+              className="w-20 h-22 text-red-400 animate-bounce"
+              style={{ animationDelay: "300ms" }}
+            />
+          </div>
+        </div>
+        <p className="text-red-500 font-medium italic flex-row">
+          Memuat Profile...
+        </p>
+        <div className="mt-4 flex justify-center space-x-2">
+          {[0, 100, 300].map((delay) => (
+            <div
+              key={delay}
+              className="w-2 h-2 bg-red-400 rounded-full animate-bounce"
+              style={{ animationDelay: `${delay}ms` }}
+            ></div>
+          ))}
         </div>
       </div>
     );

@@ -13,5 +13,4 @@ app.get("/", (req, res) => {
 });
 
 const PORT = 3000;
-
-app.listen(PORT, () => console.log(`sudah berjalan di port ${PORT}`));
+app.listen(PORT, () => console.log(`Backend berjalan di port ${PORT}`));

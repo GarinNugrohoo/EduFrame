@@ -104,7 +104,7 @@ const Home = () => {
     return (
       <div className="min-h-screen bg-gray-50 p-4 md:p-2 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-12 h-12 border-3 border-gray-300 border-t-red-600 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Memuat data...</p>
         </div>
       </div>

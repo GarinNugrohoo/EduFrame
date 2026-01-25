@@ -23,8 +23,24 @@ const QuizPage = () => {
   const fetchQuizzes = async () => {
     try {
       setLoading(true);
-      let result;
 
+      const cacheKey = subjectId
+        ? `quizzes_subject_${subjectId}`
+        : "quizzes_all";
+      const cached = localStorage.getItem(cacheKey);
+
+      if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+        const thirtyMinutes = 30 * 60 * 1000;
+
+        if (Date.now() - timestamp < thirtyMinutes) {
+          setQuizzes(data);
+          setLoading(false);
+          return;
+        }
+      }
+
+      let result;
       if (subjectId) {
         result = await quizApi.getQuizzesBySubject(subjectId);
       } else {
@@ -34,14 +50,33 @@ const QuizPage = () => {
       if (result.success) {
         const quizzesData = result.data || [];
 
-        // Fetch total questions for each quiz
         const quizzesWithDetails = await Promise.all(
           quizzesData.map(async (quiz) => {
-            try {
-              const quizDetail = await quizApi.getQuizWithQuestions(quiz.id);
-              if (quizDetail.success && quizDetail.data) {
+            const detailCacheKey = `quiz_basic_${quiz.id}`;
+            const cachedDetail = localStorage.getItem(detailCacheKey);
+
+            if (cachedDetail) {
+              const { data, timestamp } = JSON.parse(cachedDetail);
+              const thirtyMinutes = 30 * 60 * 1000;
+
+              if (Date.now() - timestamp < thirtyMinutes) {
                 return {
                   ...quiz,
+                  total_questions: data.total_questions || 0,
+                  has_questions: data.has_questions || false,
+                };
+              }
+            }
+
+            try {
+              const quizDetail = await quizApi.getQuizWithQuestions(quiz.id);
+              let detailData = {
+                total_questions: 0,
+                has_questions: false,
+              };
+
+              if (quizDetail.success && quizDetail.data) {
+                detailData = {
                   total_questions:
                     quizDetail.data.total_questions ||
                     quizDetail.data.questions?.length ||
@@ -49,10 +84,18 @@ const QuizPage = () => {
                   has_questions: (quizDetail.data.questions?.length || 0) > 0,
                 };
               }
+
+              localStorage.setItem(
+                detailCacheKey,
+                JSON.stringify({
+                  data: detailData,
+                  timestamp: Date.now(),
+                }),
+              );
+
               return {
                 ...quiz,
-                total_questions: 0,
-                has_questions: false,
+                ...detailData,
               };
             } catch (error) {
               return {
@@ -65,13 +108,28 @@ const QuizPage = () => {
         );
 
         setQuizzes(quizzesWithDetails);
+
+        localStorage.setItem(
+          cacheKey,
+          JSON.stringify({
+            data: quizzesWithDetails,
+            timestamp: Date.now(),
+          }),
+        );
       } else {
-        console.error("Error fetching quizzes:", result.message);
         setQuizzes([]);
       }
     } catch (error) {
-      console.error("Error fetching quizzes:", error);
-      setQuizzes([]);
+      const cacheKey = subjectId
+        ? `quizzes_subject_${subjectId}`
+        : "quizzes_all";
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        const { data } = JSON.parse(cached);
+        setQuizzes(data);
+      } else {
+        setQuizzes([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -79,20 +137,65 @@ const QuizPage = () => {
 
   const fetchUserStats = async () => {
     try {
+      const cacheKey = "user_stats_cache";
+      const cached = localStorage.getItem(cacheKey);
+
+      if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+        const thirtyMinutes = 30 * 60 * 1000;
+
+        if (Date.now() - timestamp < thirtyMinutes) {
+          setUserStats(data);
+          return;
+        }
+      }
+
       const result = await quizApi.getUserStats();
       if (result.success) {
         setUserStats(result.data);
+        localStorage.setItem(
+          cacheKey,
+          JSON.stringify({
+            data: result.data,
+            timestamp: Date.now(),
+          }),
+        );
       }
     } catch (error) {
-      console.error("Error fetching user stats:", error);
+      const cacheKey = "user_stats_cache";
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        const { data } = JSON.parse(cached);
+        setUserStats(data);
+      }
     }
   };
 
   const fetchUserQuizResults = async () => {
     try {
+      const cacheKey = "user_quiz_results_cache";
+      const cached = localStorage.getItem(cacheKey);
+
+      if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+        const twoMinutes = 2 * 60 * 1000;
+
+        if (Date.now() - timestamp < twoMinutes) {
+          const resultsMap = {};
+          data.forEach((quizResult) => {
+            resultsMap[quizResult.quiz_id] = {
+              score: quizResult.score,
+              completed_at: quizResult.completed_at,
+              hasAttempted: true,
+            };
+          });
+          setUserQuizResults(resultsMap);
+          return;
+        }
+      }
+
       const result = await quizApi.getUserResults();
       if (result.success && result.data) {
-        // Create a map of quiz_id to result
         const resultsMap = {};
         result.data.forEach((quizResult) => {
           resultsMap[quizResult.quiz_id] = {
@@ -102,9 +205,30 @@ const QuizPage = () => {
           };
         });
         setUserQuizResults(resultsMap);
+
+        localStorage.setItem(
+          cacheKey,
+          JSON.stringify({
+            data: result.data,
+            timestamp: Date.now(),
+          }),
+        );
       }
     } catch (error) {
-      console.error("Error fetching user quiz results:", error);
+      const cacheKey = "user_quiz_results_cache";
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        const { data } = JSON.parse(cached);
+        const resultsMap = {};
+        data.forEach((quizResult) => {
+          resultsMap[quizResult.quiz_id] = {
+            score: quizResult.score,
+            completed_at: quizResult.completed_at,
+            hasAttempted: true,
+          };
+        });
+        setUserQuizResults(resultsMap);
+      }
     }
   };
 
@@ -116,9 +240,38 @@ const QuizPage = () => {
 
   const handleStartQuiz = async (quizId) => {
     try {
+      const cacheKey = `quiz_detail_${quizId}`;
+      const cached = localStorage.getItem(cacheKey);
+
+      if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+        const thirtyMinutes = 30 * 60 * 1000;
+
+        if (
+          Date.now() - timestamp < thirtyMinutes &&
+          data.questions?.length > 0
+        ) {
+          navigate(`/quiz/${quizId}/play`, {
+            state: {
+              quiz: data,
+              startTime: new Date().toISOString(),
+            },
+          });
+          return;
+        }
+      }
+
       const result = await quizApi.getQuizWithQuestions(quizId);
 
       if (result.success && result.data && result.data.questions?.length > 0) {
+        localStorage.setItem(
+          cacheKey,
+          JSON.stringify({
+            data: result.data,
+            timestamp: Date.now(),
+          }),
+        );
+
         navigate(`/quiz/${quizId}/play`, {
           state: {
             quiz: result.data,
@@ -129,7 +282,6 @@ const QuizPage = () => {
         alert("Kuis tidak memiliki soal atau sedang dalam perbaikan");
       }
     } catch (error) {
-      console.error("Error starting quiz:", error);
       navigate(`/quiz/${quizId}/play`);
     }
   };

@@ -208,7 +208,29 @@ export const quiz = {
 
   getQuizById: async (quizId) => {
     try {
+      const cacheKey = `quiz_${quizId}`;
+      const cachedData = localStorage.getItem(cacheKey);
+
+      if (cachedData) {
+        const { data, timestamp } = JSON.parse(cachedData);
+        const now = new Date().getTime();
+        const cacheDuration = 60 * 60 * 1000;
+
+        if (now - timestamp < cacheDuration) {
+          return data;
+        }
+      }
+
       const response = await api.get(`/quizzes/${quizId}`);
+
+      if (response.data) {
+        const cacheData = {
+          data: response.data,
+          timestamp: new Date().getTime(),
+        };
+        localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+      }
+
       return response.data;
     } catch (error) {
       return handleApiError(error, "Gagal mengambil data kuis");

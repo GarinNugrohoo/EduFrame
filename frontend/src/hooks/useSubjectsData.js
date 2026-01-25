@@ -3,7 +3,7 @@ import { getSubjects } from "../api/subjects";
 import { transformSubjectsData } from "../utils/subjectTransformer";
 
 const CACHE_KEY = "subjects_cache";
-const CACHE_DURATION = 1 * 60 * 1000;
+const CACHE_DURATION = 60 * 60 * 1000;
 
 export const useSubjectsData = () => {
   const [categories, setCategories] = useState([]);
